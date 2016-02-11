@@ -11,6 +11,7 @@ public class MIP {
 	public int nDepartureTrain; //tj
 	public int nArrivalBlock; //i
 	public int nDepartureBlock; //j
+	public int nNodes; //n
 
 	public MIP() throws IOException, IloException {
 		solveMe();
@@ -25,6 +26,7 @@ public class MIP {
 		this.nDepartureTrain = 21;
 		this.nArrivalBlock = 41;
 		this.nDepartureBlock = 39;
+		this.nNodes = 10;
 
 		try{
 			//define new model
@@ -55,13 +57,41 @@ public class MIP {
 
 			//constraint ui=1
 			IloLinearNumExpr[] sumUi = new IloLinearNumExpr[nArrivalTrain]; //for all arriving trains
-
 			for(int ti=0;ti<nArrivalTrain;ti++){//for all arriving trains
 				sumUi[ti] = cplex.linearNumExpr();
 				int[] set = getArcsOut(allCompositions.get(ti), 0);
 				for(int i=0; i<nArrivalBlock;i++){ //sum over all arriving blocks
 					if(inArray(set,i)){ //alternative way of taking subset of arrivalblocks
 						sumUi[ti].addTerm(1.0,arrivalblock[i]);	
+					}
+				}
+			}
+			//add the constraint
+			for(int ti=0;ti<nArrivalTrain;ti++){//for all arriving trains
+				cplex.addEq(1, sumUi[ti]);
+			}
+			
+			//constraint ui-ui=0
+			IloLinearNumExpr[][] sumUiUi = new IloLinearNumExpr[nArrivalTrain][nNodes];
+			for(int ti=0;ti<nArrivalTrain;ti++){//for all arriving trains
+				int[] set = getIntermediates(allCompositions.get(ti));
+				for(int n=0;n<nNodes;n++){
+					if(inArray(set, n)){
+						int[] set2 = getArcsOut(allCompositions.get(ti), n);
+						for(int i=0;i<nArrivalBlock;i++){
+							if(inArray(set2, i)){
+								sumUiUi[ti][n].addTerm(1.0, arrivalblock[i]);
+							}
+						}
+					}
+				}
+			}
+			//add the constraint
+			for(int ti=0;ti<nArrivalTrain;ti++){
+				int[] set = getIntermediates(allCompositions.get(ti));
+				for(int n=0;n<nNodes;n++){
+					if(inArray(set, n)){
+						cplex.addEq(0, sumUiUi[ti][n]);
 					}
 				}
 			}

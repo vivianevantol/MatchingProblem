@@ -74,17 +74,24 @@ public class MIP {
 			//constraint ui-ui=0
 			IloLinearNumExpr[][] sumUiUi = new IloLinearNumExpr[nArrivalTrain][nNodes];
 			for(int ti=0;ti<nArrivalTrain;ti++){//for all arriving trains
+				IloLinearNumExpr[] sumUiUiTi = new IloLinearNumExpr[nNodes];
 				int[] set = getIntermediates(allCompositions.get(ti));
 				for(int n=0;n<nNodes;n++){
+					sumUiUiTi[n] = cplex.linearNumExpr();
 					if(inArray(set, n)){
-						int[] set2 = getArcsOut(allCompositions.get(ti), n);
+						int[] setout = getArcsOut(allCompositions.get(ti), n);
+						int[] setin = getArcsIn(allCompositions.get(ti), n);
 						for(int i=0;i<nArrivalBlock;i++){
-							if(inArray(set2, i)){
-								sumUiUi[ti][n].addTerm(1.0, arrivalblock[i]);
+							if(inArray(setout, i)){
+								sumUiUiTi[n].addTerm(1.0, arrivalblock[i]);
+							}
+							if(inArray(setin, i)){
+								sumUiUiTi[n].addTerm(-1.0,  arrivalblock[i]);
 							}
 						}
 					}
 				}
+				sumUiUi[ti]=sumUiUiTi;
 			}
 			//add the constraint
 			for(int ti=0;ti<nArrivalTrain;ti++){
@@ -240,12 +247,15 @@ public class MIP {
 		return arcsOut;
 	}
 
-	public static ArrayList<arcs> getArcsIn(trainComposition c, int h){
-		ArrayList<arcs> arcsIn = new ArrayList<arcs>();
+	public static int[] getArcsIn(trainComposition c, int h){
+		int[] arcsIn = new int[h];
 		ArrayList<arcs> arcsTotal = getArcs(c);
+		int fillCount = 0;
 		for(int i=0;i<arcsTotal.size();i++){
 			if(arcsTotal.get(i).getArc()[1]==h){
-				arcsIn.add(arcsTotal.get(i));
+//				arcsIn.add(arcsTotal.get(i));
+				arcsIn[fillCount] = arcsTotal.get(i).getArc()[0];
+				fillCount++;
 			}
 		}
 		return arcsIn;

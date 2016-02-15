@@ -161,7 +161,7 @@ public class MIP {
 						}
 					}
 				}
-				sumUiUi[tj]=sumVjVjTj;
+				sumVjVj[tj]=sumVjVjTj;
 			}
 			//add the constraint
 			for(int tj=0;tj<nDepartureTrain;tj++){
@@ -311,7 +311,7 @@ public class MIP {
 	//return the locations of the blocks of that train and their arc
 	public static int[][] getArcs(trainComposition c, ArrayList<blocks> arrivalblocks, ArrayList<blocks> departureblocks){
 		int All = arrivalblocks.size()+departureblocks.size();
-		int n = c.getTypes().size()*(c.getTypes().size()-1)/2; //number of arcs in train
+		int n = c.getTypes().size()*(c.getTypes().size()+1)/2; //number of arcs in train
 		int[][] allArcs = new int[n][3]; //for all blocks location and arc[2]
 		int count = 0;
 		if(c.getArrival()){

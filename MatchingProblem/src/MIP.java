@@ -205,7 +205,14 @@ public class MIP {
 				cplex.addEq(departureblock[j], sumZijVj[j]);
 			}
 
-		} finally {};
+			
+			if(cplex.solve()){
+				System.out.println("Problem Solved.");
+			}
+			
+		} catch (IloException e){
+			System.err.println("Concert exception '" + e + "' caught");
+		}
 	}
 
 	public static boolean inArray(int[] array, int x){

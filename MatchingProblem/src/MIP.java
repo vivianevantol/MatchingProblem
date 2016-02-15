@@ -29,18 +29,18 @@ public class MIP {
 		ArrayList<trainComposition> allCompositions = data.getCompositions();
 		
 		//create lists with all arrival and all departure blocks
-		int arrivals = 0;
-		int departures =0;
+//		int arrivals = 0;
+//		int departures =0;
 		for(int i=0; i < data.getCompositions().size();i++){
 			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
 			if(data.getCompositions().get(i).getArrival()){
 				arrivalBlocks = createBlocks(data.getCompositions().get(i), arrivalBlocks);
 				arrivalTrains.add(data.getCompositions().get(i));
-				arrivals++;
+//				arrivals++;
 			} else {
 				departureBlocks = createBlocks(data.getCompositions().get(i), departureBlocks);
 				departureTrains.add(data.getCompositions().get(i));
-				departures++;
+//				departures++;
 			}
 		}
 		
@@ -125,7 +125,85 @@ public class MIP {
 				}
 			}
 
-
+			//constraint vj=1
+			IloLinearNumExpr[] sumVj = new IloLinearNumExpr[nDepartureTrain]; //for all departing trains
+			for(int tj=0;tj<nDepartureTrain;tj++){//for all arriving trains
+				sumVj[tj] = cplex.linearNumExpr();
+				int[] set = getArcsOut(allCompositions.get(tj), 0, arrivalBlocks, departureBlocks);
+				for(int i=0; i<nDepartureBlock;i++){ //sum over all arriving blocks
+					if(inArray(set,i)){ //alternative way of taking subset of arrivalblocks
+						sumVj[tj].addTerm(1.0,departureblock[i]);	
+					}
+				}
+			}
+			//add the constraint
+			for(int tj=0;tj<nDepartureTrain;tj++){//for all arriving trains
+				cplex.addEq(1, sumVj[tj]);
+			}
+			
+			//constraint vj-vj=0
+			IloLinearNumExpr[][] sumVjVj = new IloLinearNumExpr[nDepartureTrain][nNodes];
+			for(int tj=0;tj<nDepartureTrain;tj++){//for all arriving trains
+				IloLinearNumExpr[] sumVjVjTj = new IloLinearNumExpr[nNodes];
+				int[] set = getIntermediates(allCompositions.get(tj));
+				for(int n=0;n<nNodes;n++){
+					sumVjVjTj[n] = cplex.linearNumExpr();
+					if(inArray(set, n)){
+						int[] setout = getArcsOut(allCompositions.get(tj), n, arrivalBlocks, departureBlocks);
+						int[] setin = getArcsIn(allCompositions.get(tj), n, arrivalBlocks, departureBlocks);
+						for(int j=0;j<nDepartureBlock;j++){
+							if(inArray(setout, j)){
+								sumVjVjTj[n].addTerm(1.0, departureblock[j]);
+							}
+							if(inArray(setin, j)){
+								sumVjVjTj[n].addTerm(-1.0,  departureblock[j]);
+							}
+						}
+					}
+				}
+				sumUiUi[tj]=sumVjVjTj;
+			}
+			//add the constraint
+			for(int tj=0;tj<nDepartureTrain;tj++){
+				int[] set = getIntermediates(allCompositions.get(tj));
+				for(int n=0;n<nNodes;n++){
+					if(inArray(set, n)){
+						cplex.addEq(0, sumVjVj[tj][n]);
+					}
+				}
+			}
+			
+			//constraint zij=ui 
+			IloLinearNumExpr[] sumZijUi = new IloLinearNumExpr[nArrivalBlock];
+			for(int i=0;i<nArrivalBlock;i++){//for all arriving blocks
+				sumZijUi[i] = cplex.linearNumExpr();
+				ArrayList<Integer> set = getSameDeparture(arrivalBlocks.get(i),departureBlocks);
+				for(int j=0;j<nDepartureBlock;j++){
+					if(inArrayList(set, j)){
+						sumZijUi[i].addTerm(1.0,  coupledblock[i][j]);
+					}
+				}
+			}
+			//add the constraint
+			for(int i=0;i<nArrivalBlock;i++){
+				cplex.addEq(arrivalblock[i], sumZijUi[i]);
+			}
+			
+			//constraint zij=vj 
+			IloLinearNumExpr[] sumZijVj = new IloLinearNumExpr[nDepartureBlock];
+			for(int j=0;j<nDepartureBlock;j++){//for all arriving blocks
+				sumZijVj[j] = cplex.linearNumExpr();
+				ArrayList<Integer> set = getSameDeparture(departureBlocks.get(j),arrivalBlocks);
+				for(int i=0;i<nArrivalBlock;i++){
+					if(inArrayList(set, i)){
+						sumZijVj[j].addTerm(1.0,  coupledblock[i][j]);
+					}
+				}
+			}
+			//add the constraint
+			for(int j=0;j<nDepartureBlock;j++){
+				cplex.addEq(departureblock[j], sumZijVj[j]);
+			}
 
 		} finally {};
 	}

@@ -204,10 +204,19 @@ public class MIP {
 			for(int j=0;j<nDepartureBlock;j++){
 				cplex.addEq(departureblock[j], sumZijVj[j]);
 			}
-
 			
 			if(cplex.solve()){
 				System.out.println("Problem Solved.");
+				for(int i=0;i<nArrivalBlock;i++){
+					for(int j=0; j<nDepartureBlock;j++){
+						if(cplex.getValue(coupledblock[i][j])==1){
+							System.out.println(cplex.getAlgorithm());
+							printBlock(arrivalBlocks.get(i));
+							printBlock(departureBlocks.get(j));//print the info on the coupled blocks
+							System.out.println("Next Match.");
+						}
+					}
+				}
 			}
 			
 		} catch (IloException e){
@@ -242,7 +251,7 @@ public class MIP {
 			int[] arc = {i, i+1};
 			ArrayList<trainType> types = new ArrayList<trainType>();
 			types.add(c.getTypes().get(i));
-			blocks x = new blocks(arc, c.getID(), types);
+			blocks x = new blocks(arc, c.getID(), types, c.getTime());
 			b.add(x);
 		}
 		if(compositionSize>1){
@@ -251,7 +260,7 @@ public class MIP {
 				ArrayList<trainType> types = new ArrayList<trainType>();
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
-				blocks x = new blocks(arc, c.getID(), types);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime());
 				b.add(x);
 			}
 		}
@@ -262,7 +271,7 @@ public class MIP {
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
-				blocks x = new blocks(arc, c.getID(), types);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime());
 				b.add(x);
 			}
 		}
@@ -274,7 +283,7 @@ public class MIP {
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
-				blocks x = new blocks(arc, c.getID(), types);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime());
 				b.add(x);
 			}
 		}
@@ -287,7 +296,7 @@ public class MIP {
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
-				blocks x = new blocks(arc, c.getID(), types);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime());
 				b.add(x);
 			}
 		}
@@ -301,7 +310,7 @@ public class MIP {
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
 				types.add(c.getTypes().get(i+5));
-				blocks x = new blocks(arc, c.getID(), types);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime());
 				b.add(x);
 			}
 		}
@@ -446,6 +455,16 @@ public class MIP {
 			}
 		}
 		return match;
+	}
+	
+	public void printBlock(blocks b){
+		int ID = b.getParent();
+		int time = b.getTime();
+		ArrayList<trainType> types = b.getTypes();
+		System.out.print(" ID: " + ID + " Time: " + time);
+		for (int i=0;i<types.size();i++){
+			System.out.print(" type " + types.get(i).getLength());
+		}
 	}
 
 }

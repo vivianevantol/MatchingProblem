@@ -6,13 +6,14 @@ public class blocks {
 	private int[] arc;
 	private int parent;
 	private ArrayList<trainType> types;
+	private int time;
 
 	
-	public blocks(int[] arc, int parent, ArrayList<trainType> types){
+	public blocks(int[] arc, int parent, ArrayList<trainType> types, int time){
 		this.arc=arc;
 		this.parent =parent;
 		this.types = types;
-
+		this.time = time;
 	}
 	
 	public int[] getArc(){
@@ -34,5 +35,9 @@ public class blocks {
 	
 	public ArrayList<trainType> getTypes(){
 		return types;
+	}
+	
+	public int getTime(){
+		return time;
 	}
 }

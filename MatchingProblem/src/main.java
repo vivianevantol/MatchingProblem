@@ -10,7 +10,7 @@ public class main {
 		// TODO Auto-generated method stub
 //		initializeData data = new initializeData();
 		try{
-		MIP matching = new MIP();
+		MIP2 matching = new MIP2();
 		} catch(IloException | IOException e) {
 			System.out.println("Error");
 		}

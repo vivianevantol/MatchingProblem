@@ -42,31 +42,55 @@ public class MIP2 {
 		
 		ArrayList<trainComposition> arrivalTrains = new ArrayList<trainComposition>(); //set Ta
 		ArrayList<trainComposition> departureTrains = new ArrayList<trainComposition>(); //set Td
+		ArrayList<trainComposition> arrivalTrainsx = new ArrayList<trainComposition>(); //set Ta
+		ArrayList<trainComposition> departureTrainsx = new ArrayList<trainComposition>(); //set Td
 		ArrayList<trainComposition> allCompositions = data.getCompositions();
 		
 		//create lists with all arrival and all departure blocks
 //		int arrivals = 0;
 //		int departures =0;
 		for(int i=0; i < data.getCompositions().size();i++){
-			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
+//			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
+			int ID = data.getCompositions().get(i).getID();
 			if(data.getCompositions().get(i).getArrival()){
+				if(ID==83011 || ID==83013 || ID==81002 || ID==83021 || ID==80428 ||ID==80206){
 				arrivalBlocks = createBlocks(data.getCompositions().get(i), arrivalBlocks);
 				arrivalTrains.add(data.getCompositions().get(i));
 //				System.out.println("Arr: " + data.getCompositions().get(i).getTypes().size());
 //				arrivals++;
+				}
 			} else {
+				if(ID==80457 || ID==83048 || ID==83024 || ID==80207 || ID==83052 ||ID==83056 ||ID==83058){
 				departureBlocks = createBlocks(data.getCompositions().get(i), departureBlocks);
 				departureTrains.add(data.getCompositions().get(i));
 //				System.out.println("Dep: " + data.getCompositions().get(i).getTypes().size());
 //				departures++;
+				}
 			}
 		}
+		
+		
+		for(int i=0;i<arrivalBlocks.size();i++){
+			printBlock(arrivalBlocks.get(i));
+			System.out.println();
+		}
+		System.out.println();
+		for(int i=0;i<departureBlocks.size();i++){
+			printBlock(departureBlocks.get(i));
+			System.out.println();
+		}
+		
 		
 		this.nArrivalTrain = arrivalTrains.size();//19
 		this.nDepartureTrain = departureTrains.size();//21
 		this.nArrivalBlock = arrivalBlocks.size();//41
 		this.nDepartureBlock = departureBlocks.size();//39
 		this.nNodes = 10;
+		
+//		for (int i=0;i<arrivalBlocks.size();i++){
+//			printBlock(arrivalBlocks.get(i));
+//			System.out.println();
+//		}
 		
 		ArrayList<int[]> ArcsOutZeroA = new ArrayList<int[]>();
 		ArrayList<ArrayList<int[]>> ArcsOutHA = new ArrayList<ArrayList<int[]>>(); //for all ti for all h int[]
@@ -77,20 +101,29 @@ public class MIP2 {
 		nArcsInHA = new int[nArrivalTrain][10];
 		
 		for(int ti=0;ti<nArrivalTrain;ti++){
-			ArcsOutZeroA.add(getArcsOut(allCompositions.get(ti), 0, arrivalBlocks, departureBlocks));
+			ArcsOutZeroA.add(getArcsOut(arrivalTrains.get(ti), 0, arrivalBlocks, departureBlocks));
 			nArcsOut0A[ti] = ArcsOutZeroA.get(ti).length;
-			nIntermediatesA[ti] = getIntermediates(allCompositions.get(ti)).length;//IntermediatesA.get(ti).length;
+			nIntermediatesA[ti] = getIntermediates(arrivalTrains.get(ti)).length;//IntermediatesA.get(ti).length;
+			
+			
 			
 			ArcsOutHA.add(new ArrayList<int[]>()); //add list to fill in below
-			for(int h=0;h<nIntermediatesA[ti];h++){ //walk on h
-				ArcsOutHA.get(ti).add(getArcsOut(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks));
-				nArcsOutHA[ti][h]=getArcsOut(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks).length;
+			for(int h=0;h<nIntermediatesA[ti]+1;h++){ //walk on h
+				ArcsOutHA.get(ti).add(getArcsOut(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks));
+				nArcsOutHA[ti][h]=getArcsOut(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
+//				System.out.println(ti + " ID " + h + " ");
+				for(int p=0;p<nArcsOutHA[ti][h];p++){
+//					printBlock(arrivalBlocks.get(ArcsOutHA.get(ti).get(h)[p]));
+//					System.out.println( "   " + ArcsOutHA.get(ti).get(h)[p]);
+				
+				}
+				
 			}
 			
 			ArcsInHA.add(new ArrayList<int[]>());
-			for(int h=0;h<nIntermediatesA[ti];h++){ //walk on h
-				ArcsInHA.get(ti).add(getArcsIn(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks));
-				nArcsInHA[ti][h]=getArcsIn(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks).length;
+			for(int h=0;h<=nIntermediatesA[ti];h++){ //walk on h
+				ArcsInHA.get(ti).add(getArcsIn(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks));
+				nArcsInHA[ti][h]=getArcsIn(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
 			}
 		}
 		
@@ -103,20 +136,20 @@ public class MIP2 {
 		nArcsInHD = new int[nDepartureTrain][10];
 		
 		for(int ti=0;ti<nDepartureTrain;ti++){
-			ArcsOutZeroD.add(getArcsOut(allCompositions.get(ti), 0, arrivalBlocks, departureBlocks));
+			ArcsOutZeroD.add(getArcsOut(departureTrains.get(ti), 0, arrivalBlocks, departureBlocks));
 			nArcsOut0D[ti] = ArcsOutZeroD.get(ti).length;
-			nIntermediatesD[ti] = getIntermediates(allCompositions.get(ti)).length;//IntermediatesA.get(ti).length;
+			nIntermediatesD[ti] = getIntermediates(departureTrains.get(ti)).length;//IntermediatesA.get(ti).length;
 			
 			ArcsOutHD.add(new ArrayList<int[]>()); //add list to fill in below
-			for(int h=0;h<nIntermediatesD[ti];h++){ //walk on h
-				ArcsOutHD.get(ti).add(getArcsOut(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks));
-				nArcsOutHD[ti][h]=getArcsOut(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks).length;
+			for(int h=0;h<=nIntermediatesD[ti];h++){ //walk on h
+				ArcsOutHD.get(ti).add(getArcsOut(departureTrains.get(ti), h, arrivalBlocks, departureBlocks));
+				nArcsOutHD[ti][h]=getArcsOut(departureTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
 			}
 			
 			ArcsInHD.add(new ArrayList<int[]>());
-			for(int h=0;h<nIntermediatesD[ti];h++){ //walk on h
-				ArcsInHD.get(ti).add(getArcsIn(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks));
-				nArcsInHD[ti][h]=getArcsIn(allCompositions.get(ti), h+1, arrivalBlocks, departureBlocks).length;
+			for(int h=0;h<=nIntermediatesD[ti];h++){ //walk on h
+				ArcsInHD.get(ti).add(getArcsIn(departureTrains.get(ti), h, arrivalBlocks, departureBlocks));
+				nArcsInHD[ti][h]=getArcsIn(departureTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
 			}
 		}
 		
@@ -135,6 +168,24 @@ public class MIP2 {
 			SameArrivals.add(getSameDeparture(departureBlocks.get(j),arrivalBlocks));
 			nSameArrivals[j] = SameArrivals.get(j).size();
 		}
+		
+//		for(int j=0;j<5;j++){
+//		for (int i=0;i<nArcsOutHA[j][0];i++){
+////			System.out.println(ArcsOutHA.get(j).get(0)[i]);
+//			printBlock(arrivalBlocks.get(ArcsOutHA.get(j).get(0)[i]));
+//			System.out.print("  next  ");
+//		}
+//		System.out.println();
+//		}
+//		for (int i=0;i<nArcsOut0A[2];i++){
+//			printBlock(arrivalBlocks.get(ArcsOutZeroA.get(2)[i]));
+//			System.out.println();
+//		}
+		
+//		for(int i=0;i<20;i++){
+//			printBlock(arrivalBlocks.get(i));
+//			System.out.println();
+//		}
 		
 		try{
 			//define new model
@@ -205,11 +256,11 @@ public class MIP2 {
 				for(int n=0;n<nIntermediatesA[ti];n++){ //this is only number value out of intermediatesA
 					sumUiUiTiPos[n] = cplex.linearNumExpr();
 					sumUiUiTiNeg[n] = cplex.linearNumExpr();
-						for(int i=0;i<nArcsOutHA[ti][n];i++){
-							sumUiUiTiPos[n].addTerm(1.0, arrivalblock[ArcsOutHA.get(ti).get(n)[i]]);
+						for(int i=0;i<nArcsOutHA[ti][n+1];i++){
+							sumUiUiTiPos[n].addTerm(1.0, arrivalblock[ArcsOutHA.get(ti).get(n+1)[i]]);
 						} //intermediates are in same order n=0 corresponds to intemediate 1
-						for(int i=0;i<nArcsInHA[ti][n];i++){
-							sumUiUiTiNeg[n].addTerm(1.0,  arrivalblock[ArcsInHA.get(ti).get(n)[i]]);
+						for(int i=0;i<nArcsInHA[ti][n+1];i++){
+							sumUiUiTiNeg[n].addTerm(1.0,  arrivalblock[ArcsInHA.get(ti).get(n+1)[i]]);
 						}
 				}
 				sumUiUiPos[ti]=sumUiUiTiPos;
@@ -218,7 +269,8 @@ public class MIP2 {
 			//add the constraint
 			for(int ti=0;ti<nArrivalTrain;ti++){
 				for(int n=0;n<nIntermediatesA[ti];n++){
-						cplex.addEq(0, cplex.diff(sumUiUiPos[ti][n], sumUiUiNeg[ti][n])); 
+//					cplex.addEq(0, cplex.diff(sumUiUiPos[ti][n], sumUiUiNeg[ti][n])); 
+					cplex.addEq(sumUiUiPos[ti][n], sumUiUiNeg[ti][n]);
 				}
 			}
 
@@ -236,24 +288,48 @@ public class MIP2 {
 			}
 			
 			//constraint vj-vj=0
-			IloLinearNumExpr[][] sumVjVj = new IloLinearNumExpr[nDepartureTrain][nNodes];
+//			IloLinearNumExpr[][] sumVjVj = new IloLinearNumExpr[nDepartureTrain][nNodes];
+//			for(int tj=0;tj<nDepartureTrain;tj++){//for all arriving trains
+//				IloLinearNumExpr[] sumVjVjTj = new IloLinearNumExpr[nIntermediatesD[tj]];
+//				for(int n=0;n<nIntermediatesD[tj];n++){ //this is only number value out of intermediatesA
+//					sumVjVjTj[n] = cplex.linearNumExpr();
+//						for(int j=0;j<nArcsOutHD[tj][n];j++){
+//								sumVjVjTj[n].addTerm(1.0, departureblock[ArcsOutHD.get(tj).get(n)[j]]);
+//						} //intermediates are in same order n=0 corresponds to intemediate 1
+//						for(int j=0;j<nArcsInHD[tj][n];j++){
+//							sumVjVjTj[n].addTerm(-1.0,  departureblock[ArcsInHD.get(tj).get(n)[j]]);
+//						}
+//				}
+//				sumVjVj[tj]=sumVjVjTj;
+//			}
+//			//add the constraint
+//			for(int tj=0;tj<nDepartureTrain;tj++){
+//				for(int n=0;n<nIntermediatesD[tj];n++){
+//						cplex.addEq(0, sumVjVj[tj][n]); 
+//				}
+//			}
+			IloLinearNumExpr[][] sumVjVjPos = new IloLinearNumExpr[nDepartureTrain][nNodes];
+			IloLinearNumExpr[][] sumVjVjNeg = new IloLinearNumExpr[nDepartureTrain][nNodes];
 			for(int tj=0;tj<nDepartureTrain;tj++){//for all arriving trains
-				IloLinearNumExpr[] sumVjVjTj = new IloLinearNumExpr[nIntermediatesD[tj]];
+				IloLinearNumExpr[] sumVjVjTjPos = new IloLinearNumExpr[nIntermediatesD[tj]];
+				IloLinearNumExpr[] sumVjVjTjNeg = new IloLinearNumExpr[nIntermediatesD[tj]];
 				for(int n=0;n<nIntermediatesD[tj];n++){ //this is only number value out of intermediatesA
-					sumVjVjTj[n] = cplex.linearNumExpr();
-						for(int j=0;j<nArcsOutHD[tj][n];j++){
-								sumVjVjTj[n].addTerm(1.0, departureblock[ArcsOutHD.get(tj).get(n)[j]]);
+					sumVjVjTjPos[n] = cplex.linearNumExpr();
+					sumVjVjTjNeg[n] = cplex.linearNumExpr();
+						for(int j=0;j<nArcsOutHD[tj][n+1];j++){
+							sumVjVjTjPos[n].addTerm(1.0, departureblock[ArcsOutHD.get(tj).get(n+1)[j]]);
 						} //intermediates are in same order n=0 corresponds to intemediate 1
-						for(int j=0;j<nArcsInHD[tj][n];j++){
-							sumVjVjTj[n].addTerm(-1.0,  departureblock[ArcsInHD.get(tj).get(n)[j]]);
+						for(int j=0;j<nArcsInHD[tj][n+1];j++){
+							sumVjVjTjNeg[n].addTerm(1.0,  departureblock[ArcsInHD.get(tj).get(n+1)[j]]);
 						}
 				}
-				sumVjVj[tj]=sumVjVjTj;
+				sumVjVjPos[tj]=sumVjVjTjPos;
+				sumVjVjNeg[tj]=sumVjVjTjNeg;
 			}
 			//add the constraint
 			for(int tj=0;tj<nDepartureTrain;tj++){
 				for(int n=0;n<nIntermediatesD[tj];n++){
-						cplex.addEq(0, sumVjVj[tj][n]); 
+						cplex.addEq(sumVjVjPos[tj][n], sumVjVjNeg[tj][n]); 
 				}
 			}
 			

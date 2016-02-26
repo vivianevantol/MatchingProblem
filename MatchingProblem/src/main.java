@@ -16,6 +16,8 @@ public class main {
 		}
 		System.out.println("Still works.");	
 		
+		
+		
 //		initializeData data = new initializeData();
 //		ArrayList<blocks> allBlocks = new ArrayList<blocks>();
 //		ArrayList<blocks> arrivalBlocks = new ArrayList<blocks>();

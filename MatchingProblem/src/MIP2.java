@@ -29,13 +29,14 @@ public class MIP2 {
 	public int[] nSameDepartures; //matches with arrival blocks
 	public int[] nSameArrivals; //matches with departure blocks
 
-	public MIP2() throws IOException, IloException {
-		solveMe();
+	public MIP2(int margin) throws IOException, IloException {
+		solveMe(margin);
 	}
 
-	public void solveMe() throws IOException, IloException {
+	public void solveMe(int margin) throws IOException, IloException {
 		//lees benodigde data in
 		initializeData data = new initializeData();
+		margin = margin; //how much time between arrival en departure
 		ArrayList<blocks> allBlocks = new ArrayList<blocks>();
 		ArrayList<blocks> arrivalBlocks = new ArrayList<blocks>();
 		ArrayList<blocks> departureBlocks = new ArrayList<blocks>();
@@ -170,12 +171,12 @@ public class MIP2 {
 		nSameArrivals = new int[departureBlocks.size()];
 		
 		for(int i=0;i<arrivalBlocks.size();i++){
-			SameDepartures.add(getSameDeparture(arrivalBlocks.get(i),departureBlocks));
+			SameDepartures.add(getSameDeparture(arrivalBlocks.get(i),departureBlocks, margin));
 			nSameDepartures[i] = SameDepartures.get(i).size();
 		}
 		
 		for(int j=0;j<departureBlocks.size();j++){
-			SameArrivals.add(getSameDeparture(departureBlocks.get(j),arrivalBlocks));
+			SameArrivals.add(getSameArrival(departureBlocks.get(j),arrivalBlocks, margin));
 			nSameArrivals[j] = SameArrivals.get(j).size();
 		}
 		
@@ -374,7 +375,7 @@ public class MIP2 {
 			System.out.println("Model exported");
 			
 			if(cplex.solve()){
-				System.out.println("Problem Solved.");
+				
 				int count = 0;
 				int[][] output = new int[(int) cplex.getValue(objective)][7];
 				for(int i=0;i<nArrivalBlock;i++){
@@ -402,17 +403,7 @@ public class MIP2 {
 					}
 				}
 				printDoubleArray(output);
-				
-//				System.out.println();
-//				for(int i=0;i<arrivalBlocks.size();i++){
-//					printBlock(arrivalBlocks.get(i));
-//					System.out.println();
-//				}
-//				System.out.println();
-//				for(int i=0;i<departureBlocks.size();i++){
-//					printBlock(departureBlocks.get(i));
-//					System.out.println();
-//				}
+				System.out.println("Problem Solved.");
 			}
 			
 		} catch (IloException e){
@@ -465,25 +456,67 @@ public class MIP2 {
 		for(int i=0;i<compositionSize;i++){ //single blocks
 			int[] arc = {i, i+1};
 			ArrayList<trainType> types = new ArrayList<trainType>();
+			ArrayList<Train> trains = new ArrayList<Train>();
 			types.add(c.getTypes().get(i));
+			if(c.getArrival()){
+				trains.add(c.getTrains().get(i));
+			}
 			int track = 104;
+			double atime = types.get(0).getCleaningtime();
 			if(c.get906a()){
 				track = 906;
 			}
-			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+			if(!trains.isEmpty()){
+				if(trains.get(0).getInspect()){
+					atime = atime+types.get(0).getInspectiontime();
+				}
+				if(trains.get(0).getRepair()){
+					atime = atime+types.get(0).getRepairtime();
+				}
+				if(trains.get(0).getWash()){
+					atime = atime+types.get(0).getWashingtime();
+				}
+			}
+			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
 			b.add(x);
 		}
 		if(compositionSize>1){
 			for(int i=0;i<compositionSize-1;i++){
 				int[] arc = {i, i+2};
 				ArrayList<trainType> types = new ArrayList<trainType>();
+				ArrayList<Train> trains = new ArrayList<Train>();
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
+				if(c.getArrival()){
+					trains.add(c.getTrains().get(i));
+					trains.add(c.getTrains().get(i+1));
+				}
 				int track = 104;
+				double atime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime();
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				if(!trains.isEmpty()){
+					if(trains.get(0).getInspect()){
+						atime = atime+types.get(0).getInspectiontime();
+					}
+					if(trains.get(0).getRepair()){
+						atime = atime+types.get(0).getRepairtime();
+					}
+					if(trains.get(0).getWash()){
+						atime = atime+types.get(0).getWashingtime();
+					}
+					if(trains.get(1).getInspect()){
+						atime = atime+types.get(1).getInspectiontime();
+					}
+					if(trains.get(1).getRepair()){
+						atime = atime+types.get(1).getRepairtime();
+					}
+					if(trains.get(1).getWash()){
+						atime = atime+types.get(1).getWashingtime();
+					}
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
 				b.add(x);
 			}
 		}
@@ -491,14 +524,50 @@ public class MIP2 {
 			for(int i=0;i<compositionSize-2;i++){
 				int[] arc = {i, i+3};
 				ArrayList<trainType> types = new ArrayList<trainType>();
+				ArrayList<Train> trains = new ArrayList<Train>();
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
+				if(c.getArrival()){
+					trains.add(c.getTrains().get(i));
+					trains.add(c.getTrains().get(i+1));
+					trains.add(c.getTrains().get(i+2));
+				}
 				int track = 104;
+				double atime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime();
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				if(!trains.isEmpty()){
+					if(trains.get(0).getInspect()){
+						atime = atime+types.get(0).getInspectiontime();
+					}
+					if(trains.get(0).getRepair()){
+						atime = atime+types.get(0).getRepairtime();
+					}
+					if(trains.get(0).getWash()){
+						atime = atime+types.get(0).getWashingtime();
+					}
+					if(trains.get(1).getInspect()){
+						atime = atime+types.get(1).getInspectiontime();
+					}
+					if(trains.get(1).getRepair()){
+						atime = atime+types.get(1).getRepairtime();
+					}
+					if(trains.get(1).getWash()){
+						atime = atime+types.get(1).getWashingtime();
+					}
+					if(trains.get(2).getInspect()){
+						atime = atime+types.get(2).getInspectiontime();
+					}
+					if(trains.get(2).getRepair()){
+						atime = atime+types.get(2).getRepairtime();
+					}
+					if(trains.get(2).getWash()){
+						atime = atime+types.get(2).getWashingtime();
+					}
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
 				b.add(x);
 			}
 		}
@@ -506,50 +575,61 @@ public class MIP2 {
 			for(int i=0;i<compositionSize-3;i++){
 				int[] arc = {i, i+4};
 				ArrayList<trainType> types = new ArrayList<trainType>();
+				ArrayList<Train> trains = new ArrayList<Train>();
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
+				if(c.getArrival()){
+					trains.add(c.getTrains().get(i));
+					trains.add(c.getTrains().get(i+1));
+					trains.add(c.getTrains().get(i+2));
+					trains.add(c.getTrains().get(i+3));
+				}
 				int track = 104;
+				double atime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime()+types.get(3).getCleaningtime();
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
-				b.add(x);
-			}
-		}
-		if(compositionSize>4){
-			for(int i=0;i<compositionSize-4;i++){
-				int[] arc = {i, i+5};
-				ArrayList<trainType> types = new ArrayList<trainType>();
-				types.add(c.getTypes().get(i));
-				types.add(c.getTypes().get(i+1));
-				types.add(c.getTypes().get(i+2));
-				types.add(c.getTypes().get(i+3));
-				types.add(c.getTypes().get(i+4));
-				int track = 104;
-				if(c.get906a()){
-					track = 906;
+				if(!trains.isEmpty()){
+					if(trains.get(0).getInspect()){
+						atime = atime+types.get(0).getInspectiontime();
+					}
+					if(trains.get(0).getRepair()){
+						atime = atime+types.get(0).getRepairtime();
+					}
+					if(trains.get(0).getWash()){
+						atime = atime+types.get(0).getWashingtime();
+					}
+					if(trains.get(1).getInspect()){
+						atime = atime+types.get(1).getInspectiontime();
+					}
+					if(trains.get(1).getRepair()){
+						atime = atime+types.get(1).getRepairtime();
+					}
+					if(trains.get(1).getWash()){
+						atime = atime+types.get(1).getWashingtime();
+					}
+					if(trains.get(2).getInspect()){
+						atime = atime+types.get(2).getInspectiontime();
+					}
+					if(trains.get(2).getRepair()){
+						atime = atime+types.get(2).getRepairtime();
+					}
+					if(trains.get(2).getWash()){
+						atime = atime+types.get(2).getWashingtime();
+					}
+					if(trains.get(3).getInspect()){
+						atime = atime+types.get(3).getInspectiontime();
+					}
+					if(trains.get(3).getRepair()){
+						atime = atime+types.get(3).getRepairtime();
+					}
+					if(trains.get(3).getWash()){
+						atime = atime+types.get(3).getWashingtime();
+					}
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
-				b.add(x);
-			}
-		}
-		if(compositionSize>5){
-			for(int i=0;i<compositionSize-5;i++){
-				int[] arc = {i, i+6};
-				ArrayList<trainType> types = new ArrayList<trainType>();
-				types.add(c.getTypes().get(i));
-				types.add(c.getTypes().get(i+1));
-				types.add(c.getTypes().get(i+2));
-				types.add(c.getTypes().get(i+3));
-				types.add(c.getTypes().get(i+4));
-				types.add(c.getTypes().get(i+5));
-				int track = 104;
-				if(c.get906a()){
-					track = 906;
-				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
 				b.add(x);
 			}
 		}
@@ -618,6 +698,7 @@ public class MIP2 {
 //		}
 		return allArcs;
 	}
+	
 
 	//subset of blocks (in locations) which belong to train c and arcs go out of h
 	public static int[] getArcsOut(trainComposition c, int h, ArrayList<blocks> arrivalblocks, ArrayList<blocks> departureblocks){
@@ -636,6 +717,7 @@ public class MIP2 {
 	}
 
 	//subset of blocks (in locations) which belong to train c and arcs go into h
+	
 	public static int[] getArcsIn(trainComposition c, int h, ArrayList<blocks> arrivalblocks, ArrayList<blocks> departureblocks){
 		int[] arcsIn = new int[h];
 		int[][] arcsTotal = getArcs(c, arrivalblocks, departureblocks);
@@ -650,6 +732,7 @@ public class MIP2 {
 	}
 
 	//only give number to fill into h so correct
+	
 	public static int[] getIntermediates(trainComposition c){
 		int[] x = new int[c.getTypes().size()-1];
 		for(int i=0; i< x.length;i++){
@@ -659,10 +742,12 @@ public class MIP2 {
 	}
 
 	//want to give the locations back not the blocks itself
-	public static ArrayList<Integer> getSameDeparture(blocks i, ArrayList<blocks> departures){
+	
+	public static ArrayList<Integer> getSameDeparture(blocks i, ArrayList<blocks> departures, int margin){
 		ArrayList<Integer> sames = new ArrayList<Integer>();
 		for(int j=0;j<departures.size();j++){
-			if(compareBlocks(departures.get(j), i)){
+			blocks nowJ = departures.get(j);
+			if(compareBlocks(nowJ, i) && nowJ.getTime()-i.getTime()>=margin+i.getActivityTime()){ //so same types
 				sames.add(j); //location of same
 			}
 		}
@@ -670,10 +755,12 @@ public class MIP2 {
 	}
 
 	//want to give the locations back not the blocks itself
-	public static ArrayList<Integer> getSameArrival(blocks i, ArrayList<blocks> arrivals){
+	
+	public static ArrayList<Integer> getSameArrival(blocks i, ArrayList<blocks> arrivals, int margin){
 		ArrayList<Integer> sames = new ArrayList<Integer>();
 		for(int j=0;j<arrivals.size();j++){
-			if(compareBlocks(arrivals.get(j), i)){
+			blocks nowJ = arrivals.get(j);
+			if(compareBlocks(nowJ, i) && i.getTime()- nowJ.getTime()>=margin+nowJ.getActivityTime()){
 				sames.add(j); //location of same
 			}
 		}
@@ -694,6 +781,7 @@ public class MIP2 {
 		}
 		return match;
 	}
+	
 	
 	public void printBlock(blocks b){
 		int ID = b.getParent();

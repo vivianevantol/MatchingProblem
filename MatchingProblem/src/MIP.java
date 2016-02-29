@@ -257,7 +257,7 @@ public class MIP {
 			if(c.get906a()){
 				track = 906;
 			}
-			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, 0);
 			b.add(x);
 		}
 		if(compositionSize>1){
@@ -270,7 +270,7 @@ public class MIP {
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, 0);
 				b.add(x);
 			}
 		}
@@ -285,7 +285,7 @@ public class MIP {
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, 0);
 				b.add(x);
 			}
 		}
@@ -301,7 +301,7 @@ public class MIP {
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, 0);
 				b.add(x);
 			}
 		}
@@ -318,7 +318,7 @@ public class MIP {
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, 0);
 				b.add(x);
 			}
 		}
@@ -336,7 +336,7 @@ public class MIP {
 				if(c.get906a()){
 					track = 906;
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, 0);
 				b.add(x);
 			}
 		}

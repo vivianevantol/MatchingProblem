@@ -35,8 +35,8 @@ public class trainComposition {
 	
 	public double getLength(){
 		double length = 0;
-		for (int i=0; i<trains.size() ;i++){
-			length = length + trains.get(i).getType().getLength();
+		for (int i=0; i<types.size() ;i++){
+			length = length + types.get(i).getLength();
 		}
 		return length;
 	}

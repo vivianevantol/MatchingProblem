@@ -370,18 +370,14 @@ public class MIP2 {
 				for(int i=0;i<nArrivalBlock;i++){
 					for(int j=0; j<nDepartureBlock;j++){
 						if(cplex.getValue(coupledblock[i][j])==1){ //blocks are coupled
-							//System.out.println(cplex.getAlgorithm());
-							//printBlock(arrivalBlocks.get(i));
-							//printBlock(departureBlocks.get(j));//print the info on the coupled blocks
-							//System.out.println("Next Match.");
 							trainComposition arrivalComp = getComposition(arrivalBlocks.get(i).getParent(), allCompositions);
 							trainComposition departureComp = getComposition(departureBlocks.get(j).getParent(), allCompositions);
 							int first = 0;
 //							System.out.println("Arrival: " + arrivalComp.getLength() + "  Departure: " + departureComp.getLength());
 							if(arrivalComp.getLength()<=departureComp.getLength() && arrivalComp.getLength()!=0){
-								first = (int) arrivalComp.getLength();
+								first = arrivalComp.getID();
 							} else if (arrivalComp.getLength()>=departureComp.getLength() && departureComp.getLength()!=0) {
-								first = (int) departureComp.getLength();
+								first = departureComp.getID();
 							}
 							
 							output[count][0] = first;

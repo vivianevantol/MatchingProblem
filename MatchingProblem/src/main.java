@@ -17,7 +17,6 @@ public class main {
 		System.out.println("Still works.");	
 		
 		
-		
 //		initializeData data = new initializeData();
 //		ArrayList<blocks> allBlocks = new ArrayList<blocks>();
 //		ArrayList<blocks> arrivalBlocks = new ArrayList<blocks>();
@@ -60,6 +59,15 @@ public class main {
 //		
 		
 		
+	}
+	
+	public static void printDoubleArray(int[][] printer){
+		for (int i=0;i<printer.length;i++){
+			for(int j=0;j<printer[0].length;j++){
+				System.out.print(printer[i][j] + "  " );
+			}
+			System.out.println();
+		}
 	}
 	
 	public static int[][] getArcs(trainComposition c, ArrayList<blocks> arrivalblocks, ArrayList<blocks> departureblocks){
@@ -135,7 +143,11 @@ public class main {
 			int[] arc = {i, i+1};
 			ArrayList<trainType> types = new ArrayList<trainType>();
 			types.add(c.getTypes().get(i));
-			blocks x = new blocks(arc, c.getID(), types, c.getTime());
+			int track = 104;
+			if(c.get906a()){
+				track = 906;
+			}
+			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 			b.add(x);
 		}
 		if(compositionSize>1){
@@ -144,7 +156,11 @@ public class main {
 				ArrayList<trainType> types = new ArrayList<trainType>();
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -155,7 +171,11 @@ public class main {
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -167,7 +187,11 @@ public class main {
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -180,7 +204,11 @@ public class main {
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -194,7 +222,11 @@ public class main {
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
 				types.add(c.getTypes().get(i+5));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}

@@ -244,14 +244,20 @@ public class MIP {
 		return check;
 	}
 
+	
+	
 	public static ArrayList<blocks> createBlocks(trainComposition c, ArrayList<blocks> b){
 		int compositionSize = c.getTypes().size();
-		boolean arrival = c.getArrival();
+//		boolean arrival = c.getArrival();
 		for(int i=0;i<compositionSize;i++){ //single blocks
 			int[] arc = {i, i+1};
 			ArrayList<trainType> types = new ArrayList<trainType>();
 			types.add(c.getTypes().get(i));
-			blocks x = new blocks(arc, c.getID(), types, c.getTime());
+			int track = 104;
+			if(c.get906a()){
+				track = 906;
+			}
+			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 			b.add(x);
 		}
 		if(compositionSize>1){
@@ -260,7 +266,11 @@ public class MIP {
 				ArrayList<trainType> types = new ArrayList<trainType>();
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -271,7 +281,11 @@ public class MIP {
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -283,7 +297,11 @@ public class MIP {
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -296,7 +314,11 @@ public class MIP {
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -310,7 +332,11 @@ public class MIP {
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
 				types.add(c.getTypes().get(i+5));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}

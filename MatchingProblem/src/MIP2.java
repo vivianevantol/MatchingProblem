@@ -70,15 +70,15 @@ public class MIP2 {
 		}
 		
 		
-		for(int i=0;i<arrivalBlocks.size();i++){
-			printBlock(arrivalBlocks.get(i));
-			System.out.println();
-		}
-		System.out.println();
-		for(int i=0;i<departureBlocks.size();i++){
-			printBlock(departureBlocks.get(i));
-			System.out.println();
-		}
+//		for(int i=0;i<arrivalBlocks.size();i++){
+//			printBlock(arrivalBlocks.get(i));
+//			System.out.println();
+//		}
+//		System.out.println();
+//		for(int i=0;i<departureBlocks.size();i++){
+//			printBlock(departureBlocks.get(i));
+//			System.out.println();
+//		}
 		
 		
 		this.nArrivalTrain = arrivalTrains.size();//19
@@ -365,20 +365,71 @@ public class MIP2 {
 			
 			if(cplex.solve()){
 				System.out.println("Problem Solved.");
-//				for(int i=0;i<nArrivalBlock;i++){
-//					for(int j=0; j<nDepartureBlock;j++){
-//						if(cplex.getValue(coupledblock[i][j])==1){
-//							System.out.println(cplex.getAlgorithm());
-//							printBlock(arrivalBlocks.get(i));
-//							printBlock(departureBlocks.get(j));//print the info on the coupled blocks
-//							System.out.println("Next Match.");
-//						}
-//					}
+				int count = 0;
+				int[][] output = new int[(int) cplex.getValue(objective)][7];
+				for(int i=0;i<nArrivalBlock;i++){
+					for(int j=0; j<nDepartureBlock;j++){
+						if(cplex.getValue(coupledblock[i][j])==1){ //blocks are coupled
+							//System.out.println(cplex.getAlgorithm());
+							//printBlock(arrivalBlocks.get(i));
+							//printBlock(departureBlocks.get(j));//print the info on the coupled blocks
+							//System.out.println("Next Match.");
+							trainComposition arrivalComp = getComposition(arrivalBlocks.get(i).getParent(), allCompositions);
+							trainComposition departureComp = getComposition(departureBlocks.get(j).getParent(), allCompositions);
+							int first = 0;
+//							System.out.println("Arrival: " + arrivalComp.getLength() + "  Departure: " + departureComp.getLength());
+							if(arrivalComp.getLength()<=departureComp.getLength() && arrivalComp.getLength()!=0){
+								first = (int) arrivalComp.getLength();
+							} else if (arrivalComp.getLength()>=departureComp.getLength() && departureComp.getLength()!=0) {
+								first = (int) departureComp.getLength();
+							}
+							
+							output[count][0] = first;
+							output[count][1] = arrivalBlocks.get(i).getParent();
+							output[count][2] = departureBlocks.get(j).getParent();
+							output[count][3] = arrivalBlocks.get(i).getTime();
+							output[count][4] = departureBlocks.get(j).getTime();
+							output[count][5] = arrivalBlocks.get(i).getTrack();
+							output[count][6] = departureBlocks.get(j).getTrack();
+							count++;
+						}
+					}
+				}
+				printDoubleArray(output);
+				
+//				System.out.println();
+//				for(int i=0;i<arrivalBlocks.size();i++){
+//					printBlock(arrivalBlocks.get(i));
+//					System.out.println();
+//				}
+//				System.out.println();
+//				for(int i=0;i<departureBlocks.size();i++){
+//					printBlock(departureBlocks.get(i));
+//					System.out.println();
 //				}
 			}
 			
 		} catch (IloException e){
 			System.err.println("Concert exception '" + e + "' caught");
+		}
+	}
+	
+	public trainComposition getComposition(int ID, ArrayList<trainComposition> comps){
+		trainComposition x = new trainComposition(new ArrayList<Train>(), new ArrayList<trainType>(), 0, true, 0, true);
+		for(int i=0; i<comps.size();i++){
+			if(comps.get(i).getID()==ID){ //composition found
+				x = comps.get(i);
+			}
+		}
+		return x;
+	}
+	
+	public static void printDoubleArray(int[][] printer){
+		for (int i=0;i<printer.length;i++){
+			for(int j=0;j<printer[0].length;j++){
+				System.out.print(printer[i][j] + "  " );
+			}
+			System.out.println();
 		}
 	}
 
@@ -409,7 +460,11 @@ public class MIP2 {
 			int[] arc = {i, i+1};
 			ArrayList<trainType> types = new ArrayList<trainType>();
 			types.add(c.getTypes().get(i));
-			blocks x = new blocks(arc, c.getID(), types, c.getTime());
+			int track = 104;
+			if(c.get906a()){
+				track = 906;
+			}
+			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 			b.add(x);
 		}
 		if(compositionSize>1){
@@ -418,7 +473,11 @@ public class MIP2 {
 				ArrayList<trainType> types = new ArrayList<trainType>();
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -429,7 +488,11 @@ public class MIP2 {
 				types.add(c.getTypes().get(i));
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -441,7 +504,11 @@ public class MIP2 {
 				types.add(c.getTypes().get(i+1));
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -454,7 +521,11 @@ public class MIP2 {
 				types.add(c.getTypes().get(i+2));
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}
@@ -468,7 +539,11 @@ public class MIP2 {
 				types.add(c.getTypes().get(i+3));
 				types.add(c.getTypes().get(i+4));
 				types.add(c.getTypes().get(i+5));
-				blocks x = new blocks(arc, c.getID(), types, c.getTime());
+				int track = 104;
+				if(c.get906a()){
+					track = 906;
+				}
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track);
 				b.add(x);
 			}
 		}

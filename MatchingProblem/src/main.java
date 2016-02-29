@@ -15,50 +15,17 @@ public class main {
 			System.out.println("Error");
 		}
 		System.out.println("Still works.");	
-		
-		
-//		initializeData data = new initializeData();
-//		ArrayList<blocks> allBlocks = new ArrayList<blocks>();
-//		ArrayList<blocks> arrivalBlocks = new ArrayList<blocks>();
-//		ArrayList<blocks> departureBlocks = new ArrayList<blocks>();
-//		
-//		ArrayList<trainComposition> arrivalTrains = new ArrayList<trainComposition>(); //set Ta
-//		ArrayList<trainComposition> departureTrains = new ArrayList<trainComposition>(); //set Td
-//		ArrayList<trainComposition> allCompositions = data.getCompositions();
-//		
-//		//create lists with all arrival and all departure blocks
-////		int arrivals = 0;
-////		int departures =0;
-//		for(int i=0; i < data.getCompositions().size();i++){
-//			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
-//			if(data.getCompositions().get(i).getArrival()){
-//				arrivalBlocks = createBlocks(data.getCompositions().get(i), arrivalBlocks);
-//				arrivalTrains.add(data.getCompositions().get(i));
-////				System.out.println("Arr: " + data.getCompositions().get(i).getTypes().size());
-////				arrivals++;
-//			} else {
-//				departureBlocks = createBlocks(data.getCompositions().get(i), departureBlocks);
-//				departureTrains.add(data.getCompositions().get(i));
-////				System.out.println("Dep: " + data.getCompositions().get(i).getTypes().size());
-////				departures++;
-//			}
-//		}
-//		
-//		int trein3[][] = getArcs(allCompositions.get(20), arrivalBlocks, departureBlocks);
-//		System.out.println(allCompositions.get(20).getID());
-////		for(int i=0; i<trein3.length;i++){
-////			for(int j=0;j<3;j++){
-////				System.out.print(trein3[i][j] + "  ");
-////			}
-////			System.out.println();
-////		}
-//		int treinuit[] = getArcsOut(allCompositions.get(20), 3, arrivalBlocks, departureBlocks);
-//		for(int i=0;i<treinuit.length;i++){
-//			System.out.println(treinuit[i]);
-//		}
-//		
-		
-		
+	
+	}
+	
+	public static trainComposition getComposition(int ID, ArrayList<trainComposition> comps){
+		trainComposition x = new trainComposition(new ArrayList<Train>(), new ArrayList<trainType>(), 0, true, 0, true);
+		for(int i=0; i<comps.size();i++){
+			if(comps.get(i).getID()==ID){ //composition found
+				x = comps.get(i);
+			}
+		}
+		return x;
 	}
 	
 	public static void printDoubleArray(int[][] printer){

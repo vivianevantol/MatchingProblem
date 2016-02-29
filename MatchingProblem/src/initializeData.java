@@ -544,7 +544,7 @@ public class initializeData {
 				allTrains2.add(f19);
 			}
 			this.c15 = new trainComposition(trains15, types15, Integer.parseInt(data[0]), arr, Integer.parseInt(data[2]), true);
-			types15.add(DDZ6);
+			types15.add(VIRM4);
 			types15.add(VIRM6);
 			allCompositions2.add(c15);
 

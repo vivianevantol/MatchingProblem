@@ -49,36 +49,46 @@ public class MIP2 {
 		//create lists with all arrival and all departure blocks
 //		int arrivals = 0;
 //		int departures =0;
+//		for(int i=0; i < data.getCompositions().size();i++){
+////			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
+//			int ID = data.getCompositions().get(i).getID();
+//			if(data.getCompositions().get(i).getArrival()){
+//				if(ID==83011 || ID==83013 || ID==81002 || ID==83021 || ID==80428 ||ID==80206){
+//				arrivalBlocks = createBlocks(data.getCompositions().get(i), arrivalBlocks);
+//				arrivalTrains.add(data.getCompositions().get(i));
+////				System.out.println("Arr: " + data.getCompositions().get(i).getTypes().size());
+////				arrivals++;
+//				}
+//			} else {
+//				if(ID==80457 || ID==83048 || ID==83024 || ID==80207 || ID==83052 ||ID==83056 ||ID==83058){
+//				departureBlocks = createBlocks(data.getCompositions().get(i), departureBlocks);
+//				departureTrains.add(data.getCompositions().get(i));
+////				System.out.println("Dep: " + data.getCompositions().get(i).getTypes().size());
+////				departures++;
+//				}
+//			}
+//		}
+		
 		for(int i=0; i < data.getCompositions().size();i++){
-//			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
-			int ID = data.getCompositions().get(i).getID();
+			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
 			if(data.getCompositions().get(i).getArrival()){
-				if(ID==83011 || ID==83013 || ID==81002 || ID==83021 || ID==80428 ||ID==80206){
 				arrivalBlocks = createBlocks(data.getCompositions().get(i), arrivalBlocks);
 				arrivalTrains.add(data.getCompositions().get(i));
-//				System.out.println("Arr: " + data.getCompositions().get(i).getTypes().size());
-//				arrivals++;
-				}
 			} else {
-				if(ID==80457 || ID==83048 || ID==83024 || ID==80207 || ID==83052 ||ID==83056 ||ID==83058){
 				departureBlocks = createBlocks(data.getCompositions().get(i), departureBlocks);
 				departureTrains.add(data.getCompositions().get(i));
-//				System.out.println("Dep: " + data.getCompositions().get(i).getTypes().size());
-//				departures++;
-				}
 			}
 		}
 		
-		
-//		for(int i=0;i<arrivalBlocks.size();i++){
-//			printBlock(arrivalBlocks.get(i));
-//			System.out.println();
-//		}
-//		System.out.println();
-//		for(int i=0;i<departureBlocks.size();i++){
-//			printBlock(departureBlocks.get(i));
-//			System.out.println();
-//		}
+		for(int i=0;i<arrivalBlocks.size();i++){
+			printBlock(arrivalBlocks.get(i));
+			System.out.println();
+		}
+		System.out.println();
+		for(int i=0;i<departureBlocks.size();i++){
+			printBlock(departureBlocks.get(i));
+			System.out.println();
+		}
 		
 		
 		this.nArrivalTrain = arrivalTrains.size();//19

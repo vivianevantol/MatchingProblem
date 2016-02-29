@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -403,6 +404,7 @@ public class MIP2 {
 					}
 				}
 				printDoubleArray(output);
+				writeExcel(output);
 				System.out.println("Problem Solved.");
 			}
 			
@@ -793,4 +795,34 @@ public class MIP2 {
 		}
 	}
 
+	public void writeExcel(int[][] matrix){
+		 FileWriter fileWriter = null;
+		 String FILE_HEADER = "Composition;ID A;ID D;Arrival;Departure;Track A;Track D";
+		 String COMMA_DELIMITER = ";"; //maybe this must be comma
+		 String NEW_LINE_SEPARATOR = "\n";
+
+
+		 try{
+			 String name = "CompositionTimesTest.csv";
+			 fileWriter = new FileWriter(name);
+			 fileWriter.append(FILE_HEADER.toString());
+			 fileWriter.append(NEW_LINE_SEPARATOR);
+			 for(int i=0;i<matrix.length;i++){ //each line
+				 for(int j=0;j<matrix[0].length;j++){ //each cel
+					 fileWriter.append(Integer.toString(matrix[i][j]));
+					 fileWriter.append(COMMA_DELIMITER);
+				 }
+				 fileWriter.append(NEW_LINE_SEPARATOR);
+			 }
+		 } catch (Exception e) {
+			 
+		 } finally {
+			 try {
+				 fileWriter.flush();
+				 fileWriter.close();
+			 } catch (IOException e) {
+				 
+			 }
+		 }
+	}
 }

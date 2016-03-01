@@ -38,7 +38,21 @@ public class HeuristicJobShop {
 			ArrayList<Jobs> A2 = setAk(T, J1, z2);
 			if(!A2.isEmpty()){I2 = maxTail(A2);} else {I2 = new Jobs(0,0,0,0,0);}
 
-			
+//			System.out.println();
+//			System.out.println("z1: " + z1 + " z2: " + z2);
+//			System.out.println("A1 jobs: ");
+//			for(int i=0;i<A1.size();i++){
+//				System.out.print(A1.get(i).getNumber());
+//				System.out.print("  ");
+//			}
+//			System.out.println();
+//			System.out.println("A2 jobs: ");
+//			for(int i=0;i<A2.size();i++){
+//				System.out.print(A2.get(i).getNumber());
+//				System.out.print("  ");
+//			}
+//			System.out.println();
+//			System.out.println("I1: " + I1.getNumber() + " I2: " + I2.getNumber());
 			
 			if(I1.getNumber()!=0 && I2.getNumber()!=0){
 				if(z1+I1.getProcessing1()+I1.getTail() <= z2+I2.getProcessing2()+I2.getTail()){//add I1 to M1
@@ -47,33 +61,38 @@ public class HeuristicJobShop {
 					output[I1.getNumber()-1][2] = z1;
 
 					T.remove(I1); //no longer to be planned
-					z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[0]);
-					z2 = Integer.max(z2, minRelease(AminB(T, J1))[0]);
+					z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[1]);
+					z2 = Integer.max(z2, minRelease(AminB(T, J1))[1]);
+//					System.out.println("Add I1 to M1");
 				} else {
 					output[I2.getNumber()-1][0] = I2.getNumber();
 					output[I2.getNumber()-1][1] = 2;
 					output[I2.getNumber()-1][2] = z2;
 
 					T.remove(I2); //no longer to be planned
-					z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[0]);
-					z1 = Integer.max(z1, minRelease(AminB(T, J2))[0]);
+					z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[1]);
+					z1 = Integer.max(z1, minRelease(AminB(T, J2))[1]);
+//					System.out.println("Add I2 to M2");
+//					System.out.println("Calc: " + z1 + " " + minRelease(AminB(T, J2))[1]);
 				}
-			} else if (I1.getNumber()!=0 && I2.getNumber()!=0){ //only one non zero
+			} else if (I1.getNumber()!=0 && I2.getNumber()==0){ //only one non zero
 				output[I1.getNumber()-1][0] = I1.getNumber();
 				output[I1.getNumber()-1][1] = 1;
 				output[I1.getNumber()-1][2] = z1;
 
 				T.remove(I1); //no longer to be planned
-				z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[0]);
-				z2 = Integer.max(z2, minRelease(AminB(T, J1))[0]);
+				z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[1]);
+				z2 = Integer.max(z2, minRelease(AminB(T, J1))[1]);
+//				System.out.println("Add I1 to M1");
 			} else if (I1.getNumber()==0 && I2.getNumber()!=0){ //only one non zero
 				output[I2.getNumber()-1][0] = I2.getNumber();
 				output[I2.getNumber()-1][1] = 2;
 				output[I2.getNumber()-1][2] = z2;
 
 				T.remove(I2); //no longer to be planned
-				z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[0]);
-				z1 = Integer.max(z1, minRelease(AminB(T, J2))[0]);
+				z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[1]);
+				z1 = Integer.max(z1, minRelease(AminB(T, J2))[1]);
+//				System.out.println("Add I2 to M2");
 			} else {
 				System.out.println("All zero Ak Error");
 			}

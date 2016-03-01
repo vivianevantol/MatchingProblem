@@ -1,0 +1,136 @@
+import java.util.ArrayList;
+
+public class HeuristicJobShop {
+	//given into the heuristic
+	private final ArrayList<Jobs> allJobs;
+	private final ArrayList<Jobs> oneJobs;
+	private final ArrayList<Jobs> twoJobs;
+
+	public HeuristicJobShop(ArrayList<Jobs> allJobs, ArrayList<Jobs> oneJobs, ArrayList<Jobs> twoJobs){
+		this.allJobs = allJobs;
+		this.oneJobs = oneJobs;
+		this.twoJobs = twoJobs;
+	}
+
+	public int[][] solver(){
+		//created by the heuristic
+		ArrayList<Jobs> J = this.allJobs;
+		ArrayList<Jobs> J1 = this.oneJobs;
+		ArrayList<Jobs> J2 = this.twoJobs;
+
+		//initialize output values
+		int[][] output = new int[J.size()][3]; //job number, h, tau
+
+		//initialize heurstic values
+		ArrayList<Jobs> T = new ArrayList<Jobs>();
+		for(int i=0;i<J.size();i++){
+			T.add(J.get(i));
+		} 
+		int z1 = minRelease(AminB(T, J2))[1];
+		int z2 = minRelease(AminB(T, J1))[1];
+
+		//Iterations start!!!
+		while(!T.isEmpty()){
+			Jobs I1 = null;
+			Jobs I2 = null;
+			ArrayList<Jobs> A1 = setAk(T, J2, z1);
+			if(!A1.isEmpty()){I1 = maxTail(A1);} else {I1 = new Jobs(0,0,0,0,0);}
+			ArrayList<Jobs> A2 = setAk(T, J1, z2);
+			if(!A2.isEmpty()){I2 = maxTail(A2);} else {I2 = new Jobs(0,0,0,0,0);}
+
+			
+			
+			if(I1.getNumber()!=0 && I2.getNumber()!=0){
+				if(z1+I1.getProcessing1()+I1.getTail() <= z2+I2.getProcessing2()+I2.getTail()){//add I1 to M1
+					output[I1.getNumber()-1][0] = I1.getNumber();
+					output[I1.getNumber()-1][1] = 1;
+					output[I1.getNumber()-1][2] = z1;
+
+					T.remove(I1); //no longer to be planned
+					z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[0]);
+					z2 = Integer.max(z2, minRelease(AminB(T, J1))[0]);
+				} else {
+					output[I2.getNumber()-1][0] = I2.getNumber();
+					output[I2.getNumber()-1][1] = 2;
+					output[I2.getNumber()-1][2] = z2;
+
+					T.remove(I2); //no longer to be planned
+					z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[0]);
+					z1 = Integer.max(z1, minRelease(AminB(T, J2))[0]);
+				}
+			} else if (I1.getNumber()!=0 && I2.getNumber()!=0){ //only one non zero
+				output[I1.getNumber()-1][0] = I1.getNumber();
+				output[I1.getNumber()-1][1] = 1;
+				output[I1.getNumber()-1][2] = z1;
+
+				T.remove(I1); //no longer to be planned
+				z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[0]);
+				z2 = Integer.max(z2, minRelease(AminB(T, J1))[0]);
+			} else if (I1.getNumber()==0 && I2.getNumber()!=0){ //only one non zero
+				output[I2.getNumber()-1][0] = I2.getNumber();
+				output[I2.getNumber()-1][1] = 2;
+				output[I2.getNumber()-1][2] = z2;
+
+				T.remove(I2); //no longer to be planned
+				z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[0]);
+				z1 = Integer.max(z1, minRelease(AminB(T, J2))[0]);
+			} else {
+				System.out.println("All zero Ak Error");
+			}
+
+		}
+
+		return output;
+	}
+
+	//   [index value]
+	public int[] minRelease(ArrayList<Jobs> list){
+		int minvalue = Integer.MAX_VALUE;
+		int minindex = -1;
+		for(int i=0;i<list.size();i++){
+			if(list.get(i).getRelease()<minvalue){
+				minvalue = list.get(i).getRelease();
+				minindex = i;
+			}
+		}
+		int[] output = {minindex, minvalue};
+		return output;
+	}
+
+	//   [index value]
+	public Jobs maxTail(ArrayList<Jobs> list){
+		int maxvalue = -1;
+		int maxindex = -1;
+		for(int i=0;i<list.size();i++){
+			if(list.get(i).getTail()>maxvalue){
+				maxvalue = list.get(i).getTail();
+				maxindex = i;
+			}
+		}
+		Jobs output = list.get(maxindex);
+		return output;
+	}
+
+	//   A\B set
+	public ArrayList<Jobs> AminB(ArrayList<Jobs> A, ArrayList<Jobs> B){
+		ArrayList<Jobs> output = new ArrayList<Jobs>();
+		for(int i=0;i<A.size();i++){
+			if(!B.contains(A.get(i))){
+				output.add(A.get(i));
+			}
+		}
+		return output;
+	}
+
+	//   create Ak 
+	public ArrayList<Jobs> setAk(ArrayList<Jobs> T, ArrayList<Jobs> Jk, int zk){
+		ArrayList<Jobs> output = new ArrayList<Jobs>();
+		for(int i=0;i<T.size();i++){
+			if(!Jk.contains(T.get(i)) && T.get(i).getRelease()<=zk){
+				output.add(T.get(i));
+			}
+		}
+		return output;
+	}
+}
+

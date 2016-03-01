@@ -9,19 +9,49 @@ public class mainJobShop {
 		ArrayList<Jobs> oneJobs = new ArrayList<Jobs>();
 		ArrayList<Jobs> twoJobs = new ArrayList<Jobs>();
 		
-		allJobs.add(new Jobs(1, 10, 2, 8, 10));
-		allJobs.add(new Jobs(2, 12, 2, 3, 4));
-		allJobs.add(new Jobs(3, 9, 8, 8, 9));
-		allJobs.add(new Jobs(4, 2, 12, 15, 10));
-		allJobs.add(new Jobs(5, 7, 15, 5, 2));
-		allJobs.add(new Jobs(6, 3, 18, 10, 10));
-		allJobs.add(new Jobs(7, 1, 29, 5, 4));
+//		TEST DATA UIT ARTIKEL
+//		allJobs.add(new Jobs(1, 10, 2, 8, 10));
+//		allJobs.add(new Jobs(2, 12, 2, 3, 4));
+//		allJobs.add(new Jobs(3, 9, 8, 8, 9));
+//		allJobs.add(new Jobs(4, 2, 12, 15, 10));
+//		allJobs.add(new Jobs(5, 7, 15, 5, 2));
+//		allJobs.add(new Jobs(6, 3, 18, 10, 10));
+//		allJobs.add(new Jobs(7, 1, 29, 5, 4));
+//		twoJobs.add(allJobs.get(2));
 		
-		twoJobs.add(allJobs.get(2));
+		//Jobs(int number, int tail, int release, int processing1, int processing2)
+		initializeData data = new initializeData();
+		initializeEventList list = new initializeEventList();
+		ArrayList<Train> trains = data.getTrains();
+		int[][] departures = list.getDeparturelist();
+		int[][] arrivals = list.getArrivallist();
 		
-		HeuristicJobShop test = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
-		int[][] output = test.solver();
-		printDoubleArray(output);
+		int maxD = 0;
+		for(int i=0;i<departures.length;i++){
+			if(departures[i][0]>maxD && departures[i][0]<10000){
+				maxD = departures[i][0];
+			}
+		}
+
+		for (int i=0; i<trains.size();i++){//moet voor elke compositie niet voor elke train!!!!!
+			int qj = maxD-departures[i][0]+2;
+			if(trains.get(i).getWash()){
+				qj = qj+ (int) trains.get(i).getType().getWashingtime();
+			}
+			int rj = arrivals[i][0]+2;
+			int p1j = (int) trains.get(i).getType().getCleaningtime();
+			if(trains.get(i).getRepair()){
+				p1j = p1j + (int) trains.get(i).getType().getRepairtime();
+			}
+			int p2j = p1j;
+			allJobs.add(new Jobs(i+1,qj,rj,p1j,p2j));
+			int nr = i+1;
+			System.out.println("nr: "+ nr +"  qj " + qj + "  rj " + rj + "  p1j " + p1j + "  p2j " + p2j);
+		}
+		
+//		HeuristicJobShop test = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
+//		int[][] output = test.solver();
+//		printDoubleArray(output);
 	}
 	
 	public static void printDoubleArray(int[][] printer){

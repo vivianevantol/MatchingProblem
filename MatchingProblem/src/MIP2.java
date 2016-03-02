@@ -38,9 +38,9 @@ public class MIP2 {
 		//lees benodigde data in
 		initializeData data = new initializeData();
 		margin = margin; //how much time between arrival en departure
-		ArrayList<blocks> allBlocks = new ArrayList<blocks>();
-		ArrayList<blocks> arrivalBlocks = new ArrayList<blocks>();
-		ArrayList<blocks> departureBlocks = new ArrayList<blocks>();
+		ArrayList<blocks> allblocks = new ArrayList<blocks>();
+		ArrayList<blocks> arrivalblocks = new ArrayList<blocks>();
+		ArrayList<blocks> departureblocks = new ArrayList<blocks>();
 		
 		ArrayList<trainComposition> arrivalTrains = new ArrayList<trainComposition>(); //set Ta
 		ArrayList<trainComposition> departureTrains = new ArrayList<trainComposition>(); //set Td
@@ -52,18 +52,18 @@ public class MIP2 {
 //		int arrivals = 0;
 //		int departures =0;
 //		for(int i=0; i < data.getCompositions().size();i++){
-////			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
+////			allblocks = createblocks(data.getCompositions().get(i), allblocks);
 //			int ID = data.getCompositions().get(i).getID();
 //			if(data.getCompositions().get(i).getArrival()){
 //				if(ID==83011 || ID==83013 || ID==81002 || ID==83021 || ID==80428 ||ID==80206){
-//				arrivalBlocks = createBlocks(data.getCompositions().get(i), arrivalBlocks);
+//				arrivalblocks = createblocks(data.getCompositions().get(i), arrivalblocks);
 //				arrivalTrains.add(data.getCompositions().get(i));
 ////				System.out.println("Arr: " + data.getCompositions().get(i).getTypes().size());
 ////				arrivals++;
 //				}
 //			} else {
 //				if(ID==80457 || ID==83048 || ID==83024 || ID==80207 || ID==83052 ||ID==83056 ||ID==83058){
-//				departureBlocks = createBlocks(data.getCompositions().get(i), departureBlocks);
+//				departureblocks = createblocks(data.getCompositions().get(i), departureblocks);
 //				departureTrains.add(data.getCompositions().get(i));
 ////				System.out.println("Dep: " + data.getCompositions().get(i).getTypes().size());
 ////				departures++;
@@ -72,35 +72,35 @@ public class MIP2 {
 //		}
 		
 		for(int i=0; i < data.getCompositions().size();i++){
-			allBlocks = createBlocks(data.getCompositions().get(i), allBlocks);
+			allblocks = createblocks(data.getCompositions().get(i), allblocks);
 			if(data.getCompositions().get(i).getArrival()){
-				arrivalBlocks = createBlocks(data.getCompositions().get(i), arrivalBlocks);
+				arrivalblocks = createblocks(data.getCompositions().get(i), arrivalblocks);
 				arrivalTrains.add(data.getCompositions().get(i));
 			} else {
-				departureBlocks = createBlocks(data.getCompositions().get(i), departureBlocks);
+				departureblocks = createblocks(data.getCompositions().get(i), departureblocks);
 				departureTrains.add(data.getCompositions().get(i));
 			}
 		}
 		
-		for(int i=0;i<arrivalBlocks.size();i++){
-			printBlock(arrivalBlocks.get(i));
+		for(int i=0;i<arrivalblocks.size();i++){
+			printBlock(arrivalblocks.get(i));
 			System.out.println();
 		}
 		System.out.println();
-		for(int i=0;i<departureBlocks.size();i++){
-			printBlock(departureBlocks.get(i));
+		for(int i=0;i<departureblocks.size();i++){
+			printBlock(departureblocks.get(i));
 			System.out.println();
 		}
 		
 		
 		this.nArrivalTrain = arrivalTrains.size();//19
 		this.nDepartureTrain = departureTrains.size();//21
-		this.nArrivalBlock = arrivalBlocks.size();//41
-		this.nDepartureBlock = departureBlocks.size();//39
+		this.nArrivalBlock = arrivalblocks.size();//41
+		this.nDepartureBlock = departureblocks.size();//39
 		this.nNodes = 10;
 		
-//		for (int i=0;i<arrivalBlocks.size();i++){
-//			printBlock(arrivalBlocks.get(i));
+//		for (int i=0;i<arrivalblocks.size();i++){
+//			printBlock(arrivalblocks.get(i));
 //			System.out.println();
 //		}
 		
@@ -113,7 +113,7 @@ public class MIP2 {
 		nArcsInHA = new int[nArrivalTrain][10];
 		
 		for(int ti=0;ti<nArrivalTrain;ti++){
-			ArcsOutZeroA.add(getArcsOut(arrivalTrains.get(ti), 0, arrivalBlocks, departureBlocks));
+			ArcsOutZeroA.add(getArcsOut(arrivalTrains.get(ti), 0, arrivalblocks, departureblocks));
 			nArcsOut0A[ti] = ArcsOutZeroA.get(ti).length;
 			nIntermediatesA[ti] = getIntermediates(arrivalTrains.get(ti)).length;//IntermediatesA.get(ti).length;
 			
@@ -121,11 +121,11 @@ public class MIP2 {
 			
 			ArcsOutHA.add(new ArrayList<int[]>()); //add list to fill in below
 			for(int h=0;h<nIntermediatesA[ti]+1;h++){ //walk on h
-				ArcsOutHA.get(ti).add(getArcsOut(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks));
-				nArcsOutHA[ti][h]=getArcsOut(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
+				ArcsOutHA.get(ti).add(getArcsOut(arrivalTrains.get(ti), h, arrivalblocks, departureblocks));
+				nArcsOutHA[ti][h]=getArcsOut(arrivalTrains.get(ti), h, arrivalblocks, departureblocks).length;
 //				System.out.println(ti + " ID " + h + " ");
 				for(int p=0;p<nArcsOutHA[ti][h];p++){
-//					printBlock(arrivalBlocks.get(ArcsOutHA.get(ti).get(h)[p]));
+//					printBlock(arrivalblocks.get(ArcsOutHA.get(ti).get(h)[p]));
 //					System.out.println( "   " + ArcsOutHA.get(ti).get(h)[p]);
 				
 				}
@@ -134,8 +134,8 @@ public class MIP2 {
 			
 			ArcsInHA.add(new ArrayList<int[]>());
 			for(int h=0;h<=nIntermediatesA[ti];h++){ //walk on h
-				ArcsInHA.get(ti).add(getArcsIn(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks));
-				nArcsInHA[ti][h]=getArcsIn(arrivalTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
+				ArcsInHA.get(ti).add(getArcsIn(arrivalTrains.get(ti), h, arrivalblocks, departureblocks));
+				nArcsInHA[ti][h]=getArcsIn(arrivalTrains.get(ti), h, arrivalblocks, departureblocks).length;
 			}
 		}
 		
@@ -148,54 +148,54 @@ public class MIP2 {
 		nArcsInHD = new int[nDepartureTrain][10];
 		
 		for(int ti=0;ti<nDepartureTrain;ti++){
-			ArcsOutZeroD.add(getArcsOut(departureTrains.get(ti), 0, arrivalBlocks, departureBlocks));
+			ArcsOutZeroD.add(getArcsOut(departureTrains.get(ti), 0, arrivalblocks, departureblocks));
 			nArcsOut0D[ti] = ArcsOutZeroD.get(ti).length;
 			nIntermediatesD[ti] = getIntermediates(departureTrains.get(ti)).length;//IntermediatesA.get(ti).length;
 			
 			ArcsOutHD.add(new ArrayList<int[]>()); //add list to fill in below
 			for(int h=0;h<=nIntermediatesD[ti];h++){ //walk on h
-				ArcsOutHD.get(ti).add(getArcsOut(departureTrains.get(ti), h, arrivalBlocks, departureBlocks));
-				nArcsOutHD[ti][h]=getArcsOut(departureTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
+				ArcsOutHD.get(ti).add(getArcsOut(departureTrains.get(ti), h, arrivalblocks, departureblocks));
+				nArcsOutHD[ti][h]=getArcsOut(departureTrains.get(ti), h, arrivalblocks, departureblocks).length;
 			}
 			
 			ArcsInHD.add(new ArrayList<int[]>());
 			for(int h=0;h<=nIntermediatesD[ti];h++){ //walk on h
-				ArcsInHD.get(ti).add(getArcsIn(departureTrains.get(ti), h, arrivalBlocks, departureBlocks));
-				nArcsInHD[ti][h]=getArcsIn(departureTrains.get(ti), h, arrivalBlocks, departureBlocks).length;
+				ArcsInHD.get(ti).add(getArcsIn(departureTrains.get(ti), h, arrivalblocks, departureblocks));
+				nArcsInHD[ti][h]=getArcsIn(departureTrains.get(ti), h, arrivalblocks, departureblocks).length;
 			}
 		}
 		
 		ArrayList<ArrayList<Integer>> SameDepartures = new ArrayList<ArrayList<Integer>>();
 		ArrayList<ArrayList<Integer>> SameArrivals = new ArrayList<ArrayList<Integer>>();
 		
-		nSameDepartures = new int[arrivalBlocks.size()];
-		nSameArrivals = new int[departureBlocks.size()];
+		nSameDepartures = new int[arrivalblocks.size()];
+		nSameArrivals = new int[departureblocks.size()];
 		
-		for(int i=0;i<arrivalBlocks.size();i++){
-			SameDepartures.add(getSameDeparture(arrivalBlocks.get(i),departureBlocks, margin));
+		for(int i=0;i<arrivalblocks.size();i++){
+			SameDepartures.add(getSameDeparture(arrivalblocks.get(i),departureblocks, margin));
 			nSameDepartures[i] = SameDepartures.get(i).size();
 		}
 		
-		for(int j=0;j<departureBlocks.size();j++){
-			SameArrivals.add(getSameArrival(departureBlocks.get(j),arrivalBlocks, margin));
+		for(int j=0;j<departureblocks.size();j++){
+			SameArrivals.add(getSameArrival(departureblocks.get(j),arrivalblocks, margin));
 			nSameArrivals[j] = SameArrivals.get(j).size();
 		}
 		
 //		for(int j=0;j<5;j++){
 //		for (int i=0;i<nArcsOutHA[j][0];i++){
 ////			System.out.println(ArcsOutHA.get(j).get(0)[i]);
-//			printBlock(arrivalBlocks.get(ArcsOutHA.get(j).get(0)[i]));
+//			printBlock(arrivalblocks.get(ArcsOutHA.get(j).get(0)[i]));
 //			System.out.print("  next  ");
 //		}
 //		System.out.println();
 //		}
 //		for (int i=0;i<nArcsOut0A[2];i++){
-//			printBlock(arrivalBlocks.get(ArcsOutZeroA.get(2)[i]));
+//			printBlock(arrivalblocks.get(ArcsOutZeroA.get(2)[i]));
 //			System.out.println();
 //		}
 		
 //		for(int i=0;i<20;i++){
-//			printBlock(arrivalBlocks.get(i));
+//			printBlock(arrivalblocks.get(i));
 //			System.out.println();
 //		}
 		
@@ -378,12 +378,12 @@ public class MIP2 {
 			if(cplex.solve()){
 				
 				int count = 0;
-				int[][] output = new int[(int) cplex.getValue(objective)][11]; //output inspection cleaning washing repair
+				int[][] output = new int[(int) cplex.getValue(objective)][7];
 				for(int i=0;i<nArrivalBlock;i++){
 					for(int j=0; j<nDepartureBlock;j++){
 						if(cplex.getValue(coupledblock[i][j])==1){ //blocks are coupled
-							trainComposition arrivalComp = getComposition(arrivalBlocks.get(i).getParent(), allCompositions);
-							trainComposition departureComp = getComposition(departureBlocks.get(j).getParent(), allCompositions);
+							trainComposition arrivalComp = getComposition(arrivalblocks.get(i).getParent(), allCompositions);
+							trainComposition departureComp = getComposition(departureblocks.get(j).getParent(), allCompositions);
 							int first = 0;
 //							System.out.println("Arrival: " + arrivalComp.getLength() + "  Departure: " + departureComp.getLength());
 							if(arrivalComp.getLength()<=departureComp.getLength() && arrivalComp.getLength()!=0){
@@ -393,21 +393,17 @@ public class MIP2 {
 							}
 							
 							output[count][0] = first;
-							output[count][1] = arrivalBlocks.get(i).getParent();
-							output[count][2] = departureBlocks.get(j).getParent();
-							output[count][3] = arrivalBlocks.get(i).getTime();
-							output[count][4] = departureBlocks.get(j).getTime();
-							output[count][5] = arrivalBlocks.get(i).getTrack();
-							output[count][6] = departureBlocks.get(j).getTrack();
-							output[count][7] = (int) arrivalBlocks.get(i).getInspectionTime();
-							output[count][8] = (int) arrivalBlocks.get(i).getCleaningTime();
-							output[count][9] = (int) arrivalBlocks.get(i).getWashingTime();
-							output[count][10] = (int) arrivalBlocks.get(i).getRepairTime();
+							output[count][1] = arrivalblocks.get(i).getParent();
+							output[count][2] = departureblocks.get(j).getParent();
+							output[count][3] = arrivalblocks.get(i).getTime();
+							output[count][4] = departureblocks.get(j).getTime();
+							output[count][5] = arrivalblocks.get(i).getTrack();
+							output[count][6] = departureblocks.get(j).getTrack();
 							count++;
 						}
 					}
 				}
-				printDoubleArray(output);
+//				printDoubleArray(output);
 				writeExcel(output);
 				System.out.println("Problem Solved.");
 			}
@@ -456,7 +452,7 @@ public class MIP2 {
 		return check;
 	}
 
-	public static ArrayList<blocks> createBlocks(trainComposition c, ArrayList<blocks> b){
+public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<blocks> b){
 		int compositionSize = c.getTypes().size();
 //		boolean arrival = c.getArrival();
 		for(int i=0;i<compositionSize;i++){ //single blocks
@@ -657,6 +653,8 @@ public class MIP2 {
 		}
 		return b;
 	}
+	
+
 
 	//return the locations of the blocks of that train and their arc
 	public static int[][] getArcs(trainComposition c, ArrayList<blocks> arrivalblocks, ArrayList<blocks> departureblocks){
@@ -769,7 +767,7 @@ public class MIP2 {
 		ArrayList<Integer> sames = new ArrayList<Integer>();
 		for(int j=0;j<departures.size();j++){
 			blocks nowJ = departures.get(j);
-			if(compareBlocks(nowJ, i) && nowJ.getTime()-i.getTime()>=margin+i.getActivityTime()){ //so same types
+			if(compareblocks(nowJ, i) && nowJ.getTime()-i.getTime()>=margin+i.getActivityTime()){ //so same types
 				sames.add(j); //location of same
 			}
 		}
@@ -782,14 +780,14 @@ public class MIP2 {
 		ArrayList<Integer> sames = new ArrayList<Integer>();
 		for(int j=0;j<arrivals.size();j++){
 			blocks nowJ = arrivals.get(j);
-			if(compareBlocks(nowJ, i) && i.getTime()- nowJ.getTime()>=margin+nowJ.getActivityTime()){
+			if(compareblocks(nowJ, i) && i.getTime()- nowJ.getTime()>=margin+nowJ.getActivityTime()){
 				sames.add(j); //location of same
 			}
 		}
 		return sames;
 	}
 
-	public static boolean compareBlocks(blocks i, blocks j){
+	public static boolean compareblocks(blocks i, blocks j){
 		ArrayList<trainType> bi = i.getTypes();
 		ArrayList<trainType> bj = j.getTypes();
 		boolean match = false;
@@ -819,11 +817,11 @@ public class MIP2 {
 		 FileWriter fileWriter = null;
 		 String FILE_HEADER = "Composition;ID A;ID D;Arrival;Departure;Track A;Track D";
 		 String COMMA_DELIMITER = ";"; //maybe this must be comma
-		 String NEW_LINE_SEPARATOR = "\r\n";
+		 String NEW_LINE_SEPARATOR = "\n";
 
 
 		 try{
-			 String name = "CompositionTimesMatching.csv";
+			 String name = "CompositionTimesTest.csv";
 			 fileWriter = new FileWriter(name);
 			 fileWriter.append(FILE_HEADER.toString());
 			 fileWriter.append(NEW_LINE_SEPARATOR);
@@ -845,5 +843,4 @@ public class MIP2 {
 			 }
 		 }
 	}
-	
 }

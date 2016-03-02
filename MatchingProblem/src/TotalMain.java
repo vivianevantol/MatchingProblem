@@ -97,7 +97,8 @@ public class TotalMain {
 		double [] results = new double [2];
 		
 //		optimizingModel3 model = new optimizingModel3(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra); //create the model
-		Heuristic model = new Heuristic(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra); //create the model
+//		Heuristic model = new Heuristic(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra); //create the model
+		HeuristicWithJobShop model = new HeuristicWithJobShop(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra, priorityPlatform1, priorityPlatform2); //create the model
 		
 		yard.tpmbuilder();
 		int[][] test = yard.returnTPM();

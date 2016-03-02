@@ -24,7 +24,7 @@ public class mainJobShop {
 //		twoJobs.add(allJobs.get(2));
 		
 		//Jobs(int number, int tail, int release, int processing1, int processing2)
-		initializeData data = new initializeData();
+//		initializeData data = new initializeData();
 		initializeEventList list = new initializeEventList();
 		int[][] departures = list.getDeparturelist();
 		
@@ -46,29 +46,13 @@ public class mainJobShop {
 			int p1j = blockdata[i][8]+ blockdata[i][10];//cleaning+repair
 			int p2j = p1j;
 			allJobs.add(new Jobs(i+1,qj,rj,p1j,p2j));
-			int nr = i+1;
-			System.out.println("nr: "+ nr +"  qj " + qj + "  rj " + rj + "  p1j " + p1j + "  p2j " + p2j);
-		}
-
-//		for (int i=0; i<comps;i++){
-//			int qj = maxD-departures[i][0]+2;
-//			if(trains.get(i).getWash()){
-//				qj = qj+ (int) trains.get(i).getType().getWashingtime();
-//			}
-//			int rj = arrivals[i][0]+2;
-//			int p1j = (int) trains.get(i).getType().getCleaningtime();
-//			if(trains.get(i).getRepair()){
-//				p1j = p1j + (int) trains.get(i).getType().getRepairtime();
-//			}
-//			int p2j = p1j;
-//			allJobs.add(new Jobs(i+1,qj,rj,p1j,p2j));
 //			int nr = i+1;
 //			System.out.println("nr: "+ nr +"  qj " + qj + "  rj " + rj + "  p1j " + p1j + "  p2j " + p2j);
-//		}
+		}
 		
-//		HeuristicJobShop test = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
-//		int[][] output = test.solver();
-//		printDoubleArray(output);
+		HeuristicJobShop test = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
+		int[][] output = test.solver();
+		printDoubleArray(output);
 	}
 	
 	//this method gives compID AID DID Atime Dtime Atrack Dtrack Itime Ctime Wtime Rtime

@@ -34,9 +34,9 @@ public class HeuristicJobShop {
 			Jobs I1 = null;
 			Jobs I2 = null;
 			ArrayList<Jobs> A1 = setAk(T, J2, z1);
-			if(!A1.isEmpty()){I1 = maxTail(A1);} else {I1 = new Jobs(0,0,0,0,0);}
+			if(!A1.isEmpty()){I1 = maxTail(A1);} else {I1 = new Jobs(0,0,0,0,0,0);}
 			ArrayList<Jobs> A2 = setAk(T, J1, z2);
-			if(!A2.isEmpty()){I2 = maxTail(A2);} else {I2 = new Jobs(0,0,0,0,0);}
+			if(!A2.isEmpty()){I2 = maxTail(A2);} else {I2 = new Jobs(0,0,0,0,0,0);}
 
 //			System.out.println();
 //			System.out.println("z1: " + z1 + " z2: " + z2);

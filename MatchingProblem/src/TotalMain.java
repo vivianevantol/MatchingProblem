@@ -2,7 +2,9 @@ import java.util.ArrayList;
 
 import ilog.concert.IloException;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
@@ -10,6 +12,7 @@ public class TotalMain {
 
 	public static void main(String[] args) throws IOException, IOException {
 		// TODO Auto-generated method stub
+		//CHECK WHETER THE RIGHT FILE IS SELECTED IN INTIIALIZE EVENTLIST AND IN INITIALIZE BLOCKINFO
 		//INITIALIZE VARIABES==========================================================================
 		long timeBefore = System.currentTimeMillis();
 		int counterdeparture = 0;
@@ -41,24 +44,23 @@ public class TotalMain {
 		int[][] departures = eventList.getDeparturelist();
 		int[][] arrivals = eventList.getArrivallist();
 		int maxD = 0;
+		int comps = 0;
 		for(int j=0;j<departures.length;j++){
 			if(departures[j][0]>maxD && departures[j][0]<10000){
 				maxD = departures[j][0];
 			}
+			if(departures[j][0]<10000){
+				comps++;
+			}
 		}
 		//initialize all jobs (the cleaning platform jobs with repair on them)
-		for (int j=0; j<trains.size();j++){
-			int qj = maxD-departures[j][0]+2;
-			if(trains.get(j).getWash()){
-				qj = qj+ (int) trains.get(j).getType().getWashingtime();
-			}
-			int rj = arrivals[j][0]+2;
-			int p1j = (int) trains.get(j).getType().getCleaningtime();
-			if(trains.get(j).getRepair()){
-				p1j = p1j + (int) trains.get(j).getType().getRepairtime();
-			}
+		int[][] blockdata = initializeBlockInfo(comps);
+		for (int j=0; j<comps;j++){
+			int qj = maxD-blockdata[j][4]+blockdata[j][9]+2; //D-departure+wash+2
+			int rj = blockdata[j][3]+2; //arrival+2
+			int p1j = blockdata[j][8]+ blockdata[j][10];//cleaning+repair
 			int p2j = p1j;
-			allJobs.add(new Jobs(j+1,qj,rj,p1j,p2j));
+			allJobs.add(new Jobs(j+1,qj,rj,p1j,p2j, blockdata[j][0]));
 		}
 		HeuristicJobShop jobshop = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
 		int[][] output = jobshop.solver();
@@ -140,6 +142,49 @@ public class TotalMain {
 			System.out.print(p.get(i) + " ");
 		}
 		System.out.println("");
+	}
+	
+	public static int[][] initializeBlockInfo(int blocks){
+		int[][] output = new int[blocks][11];
+		
+		String csvFile = "CompositionTimes.csv";
+		BufferedReader br = null;
+		String cvsSplitBy = ";"; 
+		String line = "";
+		int count = -1;
+		try {
+			br = new BufferedReader(new FileReader(csvFile));
+			line = br.readLine(); //title line
+			
+			while ((line = br.readLine()) != null) { //TELT EEN STAP TELANG DOOR GEEN ZIN OM NU TE FIXEN
+			count = count+1;
+			String[] data = line.split(cvsSplitBy);  //IDshort IDA IDD timeA timeD trackA trackD
+			output[count][0] = Integer.parseInt(data[0]); //comp ID
+			output[count][1] = Integer.parseInt(data[1]); //A ID
+			output[count][2] = Integer.parseInt(data[2]); //D ID
+			output[count][3] = Integer.parseInt(data[3]); //A time
+			output[count][4] = Integer.parseInt(data[4]); //D time
+			output[count][5] = Integer.parseInt(data[5]); //A track
+			output[count][6] = Integer.parseInt(data[6]); //D track
+			output[count][7] = Integer.parseInt(data[7]); //I time
+			output[count][8] = Integer.parseInt(data[8]); //C time
+			output[count][9] = Integer.parseInt(data[9]); //W time
+			output[count][10] = Integer.parseInt(data[10]);  //R time
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return output;
 	}
 }
 

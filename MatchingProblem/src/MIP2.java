@@ -378,7 +378,7 @@ public class MIP2 {
 			if(cplex.solve()){
 				
 				int count = 0;
-				int[][] output = new int[(int) cplex.getValue(objective)][7];
+				int[][] output = new int[(int) cplex.getValue(objective)][11]; //output inspection cleaning washing repair
 				for(int i=0;i<nArrivalBlock;i++){
 					for(int j=0; j<nDepartureBlock;j++){
 						if(cplex.getValue(coupledblock[i][j])==1){ //blocks are coupled
@@ -399,6 +399,10 @@ public class MIP2 {
 							output[count][4] = departureBlocks.get(j).getTime();
 							output[count][5] = arrivalBlocks.get(i).getTrack();
 							output[count][6] = departureBlocks.get(j).getTrack();
+							output[count][7] = (int) arrivalBlocks.get(i).getInspectionTime();
+							output[count][8] = (int) arrivalBlocks.get(i).getCleaningTime();
+							output[count][9] = (int) arrivalBlocks.get(i).getWashingTime();
+							output[count][10] = (int) arrivalBlocks.get(i).getRepairTime();
 							count++;
 						}
 					}
@@ -464,22 +468,26 @@ public class MIP2 {
 				trains.add(c.getTrains().get(i));
 			}
 			int track = 104;
-			double atime = types.get(0).getCleaningtime();
+			double ctime = types.get(0).getCleaningtime();
+			double itime=0;
+			double rtime=0;
+			double wtime=0;
 			if(c.get906a()){
 				track = 906;
 			}
 			if(!trains.isEmpty()){
 				if(trains.get(0).getInspect()){
-					atime = atime+types.get(0).getInspectiontime();
+					itime = types.get(0).getInspectiontime();
 				}
 				if(trains.get(0).getRepair()){
-					atime = atime+types.get(0).getRepairtime();
+					rtime = types.get(0).getRepairtime();
 				}
 				if(trains.get(0).getWash()){
-					atime = atime+types.get(0).getWashingtime();
+					wtime = types.get(0).getWashingtime();
 				}
 			}
-			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
+			double atime = itime + ctime + wtime + rtime;
+			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
 			b.add(x);
 		}
 		if(compositionSize>1){
@@ -494,31 +502,35 @@ public class MIP2 {
 					trains.add(c.getTrains().get(i+1));
 				}
 				int track = 104;
-				double atime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime();
+				double ctime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime();
+				double itime =0;
+				double rtime =0;
+				double wtime =0;
 				if(c.get906a()){
 					track = 906;
 				}
 				if(!trains.isEmpty()){
 					if(trains.get(0).getInspect()){
-						atime = atime+types.get(0).getInspectiontime();
+						itime = itime+types.get(0).getInspectiontime();
 					}
 					if(trains.get(0).getRepair()){
-						atime = atime+types.get(0).getRepairtime();
+						rtime = rtime+types.get(0).getRepairtime();
 					}
 					if(trains.get(0).getWash()){
-						atime = atime+types.get(0).getWashingtime();
+						wtime = wtime+types.get(0).getWashingtime();
 					}
 					if(trains.get(1).getInspect()){
-						atime = atime+types.get(1).getInspectiontime();
+						itime = itime+types.get(1).getInspectiontime();
 					}
 					if(trains.get(1).getRepair()){
-						atime = atime+types.get(1).getRepairtime();
+						rtime = rtime+types.get(1).getRepairtime();
 					}
 					if(trains.get(1).getWash()){
-						atime = atime+types.get(1).getWashingtime();
+						wtime = wtime+types.get(1).getWashingtime();
 					}
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
+				double atime = itime+ctime+wtime+rtime;
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
 				b.add(x);
 			}
 		}
@@ -536,40 +548,44 @@ public class MIP2 {
 					trains.add(c.getTrains().get(i+2));
 				}
 				int track = 104;
-				double atime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime();
+				double itime =0;
+				double rtime =0;
+				double wtime =0;
+				double ctime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime();
 				if(c.get906a()){
 					track = 906;
 				}
 				if(!trains.isEmpty()){
 					if(trains.get(0).getInspect()){
-						atime = atime+types.get(0).getInspectiontime();
+						itime = itime+types.get(0).getInspectiontime();
 					}
 					if(trains.get(0).getRepair()){
-						atime = atime+types.get(0).getRepairtime();
+						rtime = rtime+types.get(0).getRepairtime();
 					}
 					if(trains.get(0).getWash()){
-						atime = atime+types.get(0).getWashingtime();
+						wtime = wtime+types.get(0).getWashingtime();
 					}
 					if(trains.get(1).getInspect()){
-						atime = atime+types.get(1).getInspectiontime();
+						itime = itime+types.get(1).getInspectiontime();
 					}
 					if(trains.get(1).getRepair()){
-						atime = atime+types.get(1).getRepairtime();
+						rtime = rtime+types.get(1).getRepairtime();
 					}
 					if(trains.get(1).getWash()){
-						atime = atime+types.get(1).getWashingtime();
+						wtime = wtime+types.get(1).getWashingtime();
 					}
 					if(trains.get(2).getInspect()){
-						atime = atime+types.get(2).getInspectiontime();
+						itime = itime+types.get(2).getInspectiontime();
 					}
 					if(trains.get(2).getRepair()){
-						atime = atime+types.get(2).getRepairtime();
+						rtime = rtime+types.get(2).getRepairtime();
 					}
 					if(trains.get(2).getWash()){
-						atime = atime+types.get(2).getWashingtime();
+						wtime = wtime+types.get(2).getWashingtime();
 					}
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
+				double atime = itime+ctime+wtime+rtime;
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
 				b.add(x);
 			}
 		}
@@ -589,49 +605,53 @@ public class MIP2 {
 					trains.add(c.getTrains().get(i+3));
 				}
 				int track = 104;
-				double atime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime()+types.get(3).getCleaningtime();
+				double itime =0;
+				double rtime =0;
+				double wtime =0;
+				double ctime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime()+types.get(3).getCleaningtime();
 				if(c.get906a()){
 					track = 906;
 				}
 				if(!trains.isEmpty()){
 					if(trains.get(0).getInspect()){
-						atime = atime+types.get(0).getInspectiontime();
+						itime = itime+types.get(0).getInspectiontime();
 					}
 					if(trains.get(0).getRepair()){
-						atime = atime+types.get(0).getRepairtime();
+						rtime = rtime+types.get(0).getRepairtime();
 					}
 					if(trains.get(0).getWash()){
-						atime = atime+types.get(0).getWashingtime();
+						wtime = wtime+types.get(0).getWashingtime();
 					}
 					if(trains.get(1).getInspect()){
-						atime = atime+types.get(1).getInspectiontime();
+						itime = itime+types.get(1).getInspectiontime();
 					}
 					if(trains.get(1).getRepair()){
-						atime = atime+types.get(1).getRepairtime();
+						rtime = rtime+types.get(1).getRepairtime();
 					}
 					if(trains.get(1).getWash()){
-						atime = atime+types.get(1).getWashingtime();
+						wtime = wtime+types.get(1).getWashingtime();
 					}
 					if(trains.get(2).getInspect()){
-						atime = atime+types.get(2).getInspectiontime();
+						itime = itime+types.get(2).getInspectiontime();
 					}
 					if(trains.get(2).getRepair()){
-						atime = atime+types.get(2).getRepairtime();
+						rtime = rtime+types.get(2).getRepairtime();
 					}
 					if(trains.get(2).getWash()){
-						atime = atime+types.get(2).getWashingtime();
+						wtime = wtime+types.get(2).getWashingtime();
 					}
 					if(trains.get(3).getInspect()){
-						atime = atime+types.get(3).getInspectiontime();
+						itime = itime+types.get(3).getInspectiontime();
 					}
 					if(trains.get(3).getRepair()){
-						atime = atime+types.get(3).getRepairtime();
+						rtime = rtime+types.get(3).getRepairtime();
 					}
 					if(trains.get(3).getWash()){
-						atime = atime+types.get(3).getWashingtime();
+						wtime = wtime+types.get(3).getWashingtime();
 					}
 				}
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime);
+				double atime = itime + ctime + wtime + rtime;
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
 				b.add(x);
 			}
 		}
@@ -799,11 +819,11 @@ public class MIP2 {
 		 FileWriter fileWriter = null;
 		 String FILE_HEADER = "Composition;ID A;ID D;Arrival;Departure;Track A;Track D";
 		 String COMMA_DELIMITER = ";"; //maybe this must be comma
-		 String NEW_LINE_SEPARATOR = "\n";
+		 String NEW_LINE_SEPARATOR = "\r\n";
 
 
 		 try{
-			 String name = "CompositionTimesTest.csv";
+			 String name = "CompositionTimesMatching.csv";
 			 fileWriter = new FileWriter(name);
 			 fileWriter.append(FILE_HEADER.toString());
 			 fileWriter.append(NEW_LINE_SEPARATOR);
@@ -825,4 +845,5 @@ public class MIP2 {
 			 }
 		 }
 	}
+	
 }

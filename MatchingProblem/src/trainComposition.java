@@ -67,4 +67,5 @@ public class trainComposition {
 			this.types.set(i, x.get(i));
 		}
 	}
+	
 }

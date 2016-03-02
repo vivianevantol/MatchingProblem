@@ -63,9 +63,29 @@ public class TotalMain {
 			allJobs.add(new Jobs(j+1,qj,rj,p1j,p2j, blockdata[j][0]));
 		}
 		HeuristicJobShop jobshop = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
-		int[][] output = jobshop.solver();
+		int[][] output = jobshop.solver(); //this is already sorted on starting times
+		printDoubleArray(output);
 		
+		ArrayList<Integer> M1 = new ArrayList<Integer>();
+		ArrayList<Integer> M2 = new ArrayList<Integer>();
+		for(int j=0;j<output.length;j++){
+			if(output[j][1]==1){
+				M1.add(output[j][3]);
+			} else {
+				M2.add(output[j][3]);
+			}
+		}
+		printList(M1);
+		printList(M2);
 		
+		//DEFINE INPUT FOR HEURISTIC!!!!
+		ArrayList<Integer> priorityPlatform1 = new ArrayList<Integer>();
+		ArrayList<Integer> priorityPlatform2 = new ArrayList<Integer>();
+		priorityPlatform1.addAll(M1);
+		priorityPlatform2.addAll(M2);
+		//if also try other platform
+//		priorityPlatform1.addAll(M2);
+//		priorityPlatform2.addAll(M1);
 		
 		int[] priorityArrivaltrack = {1, 2, 3, 4}; 
 		int[] priorityArrival =  {31, 35, 38, 32, 36, 39, 33, 37, 40};  
@@ -104,28 +124,14 @@ public class TotalMain {
 		System.out.println("Completed activities:   " + countervolledigfeasible + " out of " + nriterations + "(" + 100*countervolledigfeasible/nriterations + "%)");
 		System.out.println("Feasible run:   " + countervolledigfeasiblehelemaal + " out of "+ nriterations + "(" + 100*countervolledigfeasiblehelemaal/nriterations + "%)");
 		System.out.println("The runX time was " + elapsedTime/1000 + " seconds.");
-		
-// 34,25, 19, 26, 11, 18, 24, 30, 10,  17, 23, 29, 9, 16, 22, 28, 8, 15, 21, 27, 7, 14, 20, 26, 6, 13, 19, 25,5, 12
-		//	int[][] positionsPerTrack = {
-		//			{1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},//t906a vrijhouden / aankomst+depart area
-		//			{5, 6, 7, 8, 9, 10, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0},//t52 depart area
-		//			{12, 13, 14, 15, 16, 17, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0},//53 depart area
-		//			{19, 20, 21, 22, 23, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},//54 depart area
-		//			{25, 26, 27, 28, 29, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},//t55 depart area
-		//			{31, 32, 33, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //t56 arrival area
-		//			{35, 36, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //t57 arrival area
-		//			{38, 39, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},//t58 arrival area
-		//			{41, 42, 43, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //t59 arrival area
-		//			{ 44,45, 46, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},//t60 vrijhouden
-		//			{48, 49, 50,51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //t61 intern wassen
-		//			{52, 53, 54, 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //t62 intern wassen
-		//			{56, 57, 58, 59, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //t63 extern wassen
-		//			{61, 62, 63, 64, 65, 66, 67, 0, 0, 0, 0, 0, 0, 0, 0, 0}, //t104 vrijhouden
-		//	};
 
-
-
-
+	}
+	
+	public static void printList(ArrayList<Integer> p){
+		for (int i=0;i<p.size();i++){
+			System.out.print(p.get(i) + " ");
+		}
+		System.out.println("");
 	}
 	
 	public static void printDoubleArray(int[][] printer){
@@ -145,9 +151,9 @@ public class TotalMain {
 	}
 	
 	public static int[][] initializeBlockInfo(int blocks){
-		int[][] output = new int[blocks][11];
+		int[][] output = new int[blocks+1][11];
 		
-		String csvFile = "CompositionTimes.csv";
+		String csvFile = "CompositionTimesMatching.csv";
 		BufferedReader br = null;
 		String cvsSplitBy = ";"; 
 		String line = "";

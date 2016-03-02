@@ -55,17 +55,25 @@ public class mainJobShop {
 		int[][] output = test.solver();
 		printDoubleArray(output);
 		
-//		ArrayList<>
-//		for(int i=0;i<output.length;i++){
-//			if(output[i][1]==1){
-//				
-//			}
-//		}
+		ArrayList<Integer> M1 = new ArrayList<Integer>();
+		ArrayList<Integer> M2 = new ArrayList<Integer>();
+		for(int j=0;j<output.length;j++){
+			if(output[j][1]==1){
+				M1.add(output[j][3]);
+			} else {
+				M2.add(output[j][3]);
+			}
+		}
+		printList(M1);
+		printList(M2);
+		
+		M1.addAll(M2);
+		printList(M1);
 	}
 	
 	//this method gives compID AID DID Atime Dtime Atrack Dtrack Itime Ctime Wtime Rtime
 	public static int[][] initializeBlockInfo(int blocks){
-		int[][] output = new int[blocks][11];
+		int[][] output = new int[blocks+1][11];
 		
 		String csvFile = "CompositionTimesMatching.csv";
 		BufferedReader br = null;
@@ -116,4 +124,10 @@ public class mainJobShop {
 		}
 	}
 
+	public static void printList(ArrayList<Integer> p){
+		for (int i=0;i<p.size();i++){
+			System.out.print(p.get(i) + " ");
+		}
+		System.out.println("");
+	}
 }

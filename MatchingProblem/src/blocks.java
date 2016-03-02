@@ -22,10 +22,10 @@ public blocks(int[] arc, int parent, ArrayList<trainType> types, int time, int t
 		this.time = time;
 		this.track = track;
 		this.activityTime = activityTime;
-		this.washingTime = 0;
-		this.inspectionTime = 0;
-		this.cleaningTime = 0;
-		this.repairTime = 0;
+		this.washingTime = washingTime;
+		this.inspectionTime = inspectionTime;
+		this.cleaningTime = cleaningTime;
+		this.repairTime = repairTime;
 	}
 	
 	public int[] getArc(){
@@ -59,5 +59,21 @@ public blocks(int[] arc, int parent, ArrayList<trainType> types, int time, int t
 	
 	public int getTime(){
 		return time;
+	}
+	
+	public double getWashingTime(){
+		return washingTime;
+	}
+	
+	public double getCleaningTime(){
+		return cleaningTime;
+	}
+	
+	public double getRepairTime(){
+		return repairTime;
+	}
+	
+	public double getInspectionTime(){
+		return inspectionTime;
 	}
 }

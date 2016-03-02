@@ -19,7 +19,8 @@ public class HeuristicJobShop {
 		ArrayList<Jobs> J2 = this.twoJobs;
 
 		//initialize output values
-		int[][] output = new int[J.size()][3]; //job number, h, tau
+		int[][] output = new int[J.size()][4]; //job number, h, tau
+		int[][] outputx = new int[J.size()][4]; //job number, h, tau
 
 		//initialize heurstic values
 		ArrayList<Jobs> T = new ArrayList<Jobs>();
@@ -59,6 +60,7 @@ public class HeuristicJobShop {
 					output[I1.getNumber()-1][0] = I1.getNumber();
 					output[I1.getNumber()-1][1] = 1;
 					output[I1.getNumber()-1][2] = z1;
+					output[I1.getNumber()-1][3] = I1.getID();
 
 					T.remove(I1); //no longer to be planned
 					z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[1]);
@@ -68,6 +70,7 @@ public class HeuristicJobShop {
 					output[I2.getNumber()-1][0] = I2.getNumber();
 					output[I2.getNumber()-1][1] = 2;
 					output[I2.getNumber()-1][2] = z2;
+					output[I2.getNumber()-1][3] = I2.getID();
 
 					T.remove(I2); //no longer to be planned
 					z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[1]);
@@ -79,6 +82,7 @@ public class HeuristicJobShop {
 				output[I1.getNumber()-1][0] = I1.getNumber();
 				output[I1.getNumber()-1][1] = 1;
 				output[I1.getNumber()-1][2] = z1;
+				output[I1.getNumber()-1][3] = I1.getID();
 
 				T.remove(I1); //no longer to be planned
 				z1 = Integer.max(z1+I1.getProcessing1(),minRelease(AminB(T, J2))[1]);
@@ -88,6 +92,7 @@ public class HeuristicJobShop {
 				output[I2.getNumber()-1][0] = I2.getNumber();
 				output[I2.getNumber()-1][1] = 2;
 				output[I2.getNumber()-1][2] = z2;
+				output[I2.getNumber()-1][3] = I2.getID();
 
 				T.remove(I2); //no longer to be planned
 				z2 = Integer.max(z2+I2.getProcessing2(),minRelease(AminB(T, J1))[1]);
@@ -99,7 +104,27 @@ public class HeuristicJobShop {
 
 		}
 
-		return output;
+		ArrayList<int[]> sorting = new ArrayList<int[]>();
+		sorting.add(output[0]);
+		for(int i=1;i<output.length;i++){
+			int found = 0;
+			for(int j=0;j<sorting.size();j++){
+				if(output[i][2]<sorting.get(j)[2]){
+					sorting.add(j, output[i]);
+					found =1;
+					j=100;
+				}
+			}
+			if(found==0){
+				sorting.add(output[i]);
+			}
+		}
+		for(int i=0;i<sorting.size();i++){
+			outputx[i] = sorting.get(i);
+		}
+
+		
+		return outputx;
 	}
 
 	//   [index value]

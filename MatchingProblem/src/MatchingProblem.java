@@ -377,7 +377,7 @@ public class MatchingProblem {
 			if(cplex.solve()){
 				
 				int count = 0;
-				int[][] output = new int[(int) cplex.getValue(objective)][7];
+				int[][] output = new int[(int) cplex.getValue(objective)][11];
 				for(int i=0;i<nArrivalBlock;i++){
 					for(int j=0; j<nDepartureBlock;j++){
 						if(cplex.getValue(coupledblock[i][j])==1){ //blocks are coupled
@@ -398,6 +398,10 @@ public class MatchingProblem {
 							output[count][4] = departureblocks.get(j).getTime();
 							output[count][5] = arrivalblocks.get(i).getTrack();
 							output[count][6] = departureblocks.get(j).getTrack();
+							output[count][7] = (int) arrivalblocks.get(i).getInspectionTime();
+							output[count][8] = (int) arrivalblocks.get(i).getCleaningTime();
+							output[count][9] = (int) arrivalblocks.get(i).getWashingTime();
+							output[count][10] = (int) arrivalblocks.get(i).getRepairTime();
 							count++;
 						}
 					}
@@ -816,15 +820,21 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 		 FileWriter fileWriter = null;
 		 String FILE_HEADER = "Composition;ID A;ID D;Arrival;Departure;Track A;Track D";
 		 String COMMA_DELIMITER = ";"; //maybe this must be comma
-		 String NEW_LINE_SEPARATOR = "\n";
+		 String NEW_LINE_SEPARATOR = "\r\n";
 
 
 		 try{
-			 String name = "CompositionTimesTest.csv";
+			 String name = "CompositionTimesMatching.csv";
 			 fileWriter = new FileWriter(name);
 			 fileWriter.append(FILE_HEADER.toString());
 			 fileWriter.append(NEW_LINE_SEPARATOR);
 			 for(int i=0;i<matrix.length;i++){ //each line
+//				 for(int j=0;j<matrix[0].length-1;j++){ //each cel
+//					 fileWriter.append(Integer.toString(matrix[i][j]));
+//					 fileWriter.append(COMMA_DELIMITER);
+//				 }
+//				 fileWriter.append(Integer.toString(matrix[i][matrix[0].length-1]));
+//				 fileWriter.append(NEW_LINE_SEPARATOR);
 				 for(int j=0;j<matrix[0].length;j++){ //each cel
 					 fileWriter.append(Integer.toString(matrix[i][j]));
 					 fileWriter.append(COMMA_DELIMITER);

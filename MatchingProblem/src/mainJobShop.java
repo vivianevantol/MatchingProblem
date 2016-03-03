@@ -28,6 +28,8 @@ public class mainJobShop {
 		initializeEventList list = new initializeEventList();
 		int[][] departures = list.getDeparturelist();
 		
+		printDoubleArray(departures);
+		
 		int maxD = 0;
 		int comps = 0;
 		for(int i=0;i<departures.length;i++){
@@ -53,7 +55,7 @@ public class mainJobShop {
 		
 		HeuristicJobShop test = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
 		int[][] output = test.solver();
-		printDoubleArray(output);
+//		printDoubleArray(output);
 		
 		ArrayList<Integer> M1 = new ArrayList<Integer>();
 		ArrayList<Integer> M2 = new ArrayList<Integer>();
@@ -75,7 +77,8 @@ public class mainJobShop {
 	public static int[][] initializeBlockInfo(int blocks){
 		int[][] output = new int[blocks+1][11];
 		
-		String csvFile = "CompositionTimesMatching.csv";
+		String csvFile = "CompositionTimes.csv";
+//		String csvFile = "CompositionTimesMatching.csv";
 		BufferedReader br = null;
 		String cvsSplitBy = ";"; 
 		String line = "";
@@ -86,6 +89,7 @@ public class mainJobShop {
 			
 			while ((line = br.readLine()) != null) { //TELT EEN STAP TELANG DOOR GEEN ZIN OM NU TE FIXEN
 			count = count+1;
+			
 			String[] data = line.split(cvsSplitBy);  //IDshort IDA IDD timeA timeD trackA trackD
 			output[count][0] = Integer.parseInt(data[0]); //comp ID
 			output[count][1] = Integer.parseInt(data[1]); //A ID
@@ -98,6 +102,7 @@ public class mainJobShop {
 			output[count][8] = Integer.parseInt(data[8]); //C time
 			output[count][9] = Integer.parseInt(data[9]); //W time
 			output[count][10] = Integer.parseInt(data[10]);  //R time
+			
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

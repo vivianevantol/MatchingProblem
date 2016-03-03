@@ -24,7 +24,7 @@ public class initializeEventList {
 	}	
 
 	public  int[][] initializeArrivallist() {
-		int[][] arrivallist = new int [50][2]; //tijden trainID
+		int[][] arrivallist = new int [50][3]; //tijden trainID
 		
 		
 		for (int j=0; j<50; j++){
@@ -48,6 +48,7 @@ public class initializeEventList {
 			arrivallist[count][0] = Integer.parseInt(data[3]); //timeA
 //			System.out.println(Integer.parseInt(data[3]));
 			arrivallist[count][1] = Integer.parseInt(data[0]); //ID short to get compositiontype
+			arrivallist[count][2] = Integer.parseInt(data[5]);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -68,7 +69,7 @@ public class initializeEventList {
 	}
 
 	public  int[][] initializeDeparturelist() {
-		int [][] departurelist = new int [50][2]; //tijden trainID
+		int [][] departurelist = new int [50][3]; //tijden trainID
 		
 		for (int j=0; j<50; j++){
 			departurelist[j][0] = Integer.MAX_VALUE;		
@@ -90,6 +91,7 @@ public class initializeEventList {
 				
 			departurelist[count][0] = Integer.parseInt(data[4]); //timeD
 			departurelist[count][1] = Integer.parseInt(data[0]); //ID short (since only one ID necessary)
+			departurelist[count][2] = Integer.parseInt(data[6]); //ID short (since only one ID necessary)
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

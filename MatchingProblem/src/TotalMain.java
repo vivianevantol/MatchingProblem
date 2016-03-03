@@ -18,14 +18,13 @@ public class TotalMain {
 		int counterdeparture = 0;
 		int countervolledigfeasible = 0;
 		int countervolledigfeasiblehelemaal = 0;
-		int nriterations = 1;
-		for (int i = 0; i < nriterations ; i++){
-		initializeData data = new initializeData(); //create the data set
-		
 		
 		//GIVE INPUT===================================================================================
 		int MatchingMargin = 0;
-
+		int nriterations = 100;
+		
+		for (int i = 0; i < nriterations ; i++){
+		initializeData data = new initializeData(); //create the data set
 		
 		///EXECUTE MATCHING============================================================================
 		try{ //directly prints output into "CompositionTimesMatching.csv"
@@ -64,7 +63,7 @@ public class TotalMain {
 		}
 		HeuristicJobShop jobshop = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
 		int[][] output = jobshop.solver(); //this is already sorted on starting times
-		printDoubleArray(output);
+//		printDoubleArray(output);
 		
 		ArrayList<Integer> M1 = new ArrayList<Integer>();
 		ArrayList<Integer> M2 = new ArrayList<Integer>();
@@ -75,8 +74,8 @@ public class TotalMain {
 				M2.add(output[j][3]);
 			}
 		}
-		printList(M1);
-		printList(M2);
+//		printList(M1);
+//		printList(M2);
 		
 		//DEFINE INPUT FOR HEURISTIC!!!!
 		ArrayList<Integer> priorityPlatform1 = new ArrayList<Integer>();
@@ -97,8 +96,8 @@ public class TotalMain {
 		double [] results = new double [2];
 		
 //		optimizingModel3 model = new optimizingModel3(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra); //create the model
-//		Heuristic model = new Heuristic(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra); //create the model
-		HeuristicWithJobShop model = new HeuristicWithJobShop(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra, priorityPlatform1, priorityPlatform2); //create the model
+		Heuristic model = new Heuristic(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra); //create the model
+//		HeuristicWithJobShop model = new HeuristicWithJobShop(data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra, priorityPlatform1, priorityPlatform2); //create the model
 		
 		yard.tpmbuilder();
 		int[][] test = yard.returnTPM();

@@ -9,60 +9,88 @@ import ilog.concert.IloException;
 
 public class main {
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-//		initializeEventList eventList = new initializeEventList(); //create the eventlist
-//		
-//		ArrayList<Jobs> allJobs = new ArrayList<Jobs>();
-//		ArrayList<Jobs> oneJobs = new ArrayList<Jobs>();
-//		ArrayList<Jobs> twoJobs = new ArrayList<Jobs>();
-//
-//		int[][] departures = eventList.getDeparturelist();
-//		int maxD = 0;
-//		int comps = 0;
-//		for(int j=0;j<departures.length;j++){
-//			if(departures[j][0]>maxD && departures[j][0]<10000){
-//				maxD = departures[j][0];
-//			}
-//			if(departures[j][0]<10000){
-//				comps++;
-//			}
-//		}
-//		//initialize all jobs (the cleaning platform jobs with repair on them)
-//		int[][] blockdata = initializeBlockInfo(comps);
-//		for (int j=0; j<comps;j++){
-//			int qj = maxD-blockdata[j][4]+blockdata[j][9]+2; //D-departure+wash+2
-//			int rj = blockdata[j][3]+2; //arrival+2
-//			int p1j = blockdata[j][8]+ blockdata[j][10];//cleaning+repair
-//			int p2j = p1j;
-//			allJobs.add(new Jobs(j+1,qj,rj,p1j,p2j, blockdata[j][0]));
-//		}
-//		HeuristicJobShop jobshop = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
-//		int[][] output = jobshop.solver(); //this is already sorted on starting times
-//		
-//		ArrayList<Integer> M1 = new ArrayList<Integer>();
-//		ArrayList<Integer> M2 = new ArrayList<Integer>();
-//		for(int j=0;j<output.length;j++){
-//			if(output[j][1]==1){
-//				M1.add(output[j][3]);
-//			} else {
-//				M2.add(output[j][3]);
-//			}
-//		}
-//		printList(M1);
-//		printList(M2);
-		ArrayList<Integer> x = new ArrayList<Integer>();
-		x.add(3);
-		x.add(1);
-		x.add(4);
-		x.add(2);
-		printList(x);
+	public static void main(String[] args) throws FileNotFoundException, IOException, IloException {
+		initializeData data = new initializeData(); //create the data set
+		InitializeShuntingYard yard = new InitializeShuntingYard(); //create the shunting yard
+		initializeEventList eventList = new initializeEventList(); //create the eventlist
 		
-		x.remove(2);
-		printList(x);
+		int[][] departures = eventList.getDeparturelist();
+		int[][] arrivals = eventList.getArrivallist();
+		int[][] trainInfo = new int[22][4]; //ID Atime Dtime Length //22 is number of trains!!
+		for (int x=0;x<trainInfo.length;x++){ 
+			trainInfo[x][0] = departures[x][1];
+			trainInfo[x][1] = arrivals[x][0];
+			trainInfo[x][2] = departures[x][0];
+			trainInfo[x][3] = (int) getLength(departures[x][1], data);
+		}
 		
-	
+		printDoubleArray(trainInfo);
+//		ArrayList<Track> tracks = yard.getTracks();
+//		int[][] trackInfo = new int[4][3]; //lengt left right
+//		for(int s=1;s<5;s++){ //the departure tracks!!
+//			trackInfo[s-1][0] = (int) tracks.get(s).getLength(); 
+//			trackInfo[s-1][1] = 0;
+//			trackInfo[s-1][2] = 0;
+//		}
+//		
+//		
+//		ArrayList<ArrayList<Integer>> allA =  new ArrayList<ArrayList<Integer>>();
+//		int[] AssTrack = new int[trackInfo.length];
+//		int[][] AssTrackTrain = new int[trackInfo.length][trainInfo.length];
+//		
+//		ParkingSetCovering Parking = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
+////		double[] output = Parking.getDuals();
+////		printArray(output);
+//		int[] penalties = Parking.getPenalty();
+//		int[][] assignments = Parking.getAssignments();
+////		printArray(penalties);
+//		printDoubleArray(assignments);
+		
+//		int[] test = {7, 2, 4, 9, 1};
+//		int[] output = getMin(test, 0);
+//		System.out.println("Index: " + output[0]);
+//		System.out.println("Value: " + output[1]);
 	}
 	
+	public static int[] getMin(int[] x, int trys){
+		int[] y= new int[x.length];
+		for (int i=0;i<x.length;i++){
+			y[i] = x[i];
+		}
+		int now = -1;
+		
+		int minvalue = 800000;
+		int index = -1;
+		while(now!=trys){
+			now++;
+			minvalue = Integer.MAX_VALUE;
+			index = -1;
+			for (int i=0;i<x.length;i++){
+				if(x[i]<minvalue){
+					index = i;
+					minvalue = x[i];
+				}
+			}
+			x[index] = Integer.MAX_VALUE;
+		}
+		int[] yy = {index, minvalue};
+		return yy;
+	}
+	
+
+	public static void printArray(double[] printer){
+		for (int i=0;i<printer.length;i++){
+				System.out.print(printer[i] + "  " );
+			System.out.println();
+		}
+	}
+	
+	public static void printArray(int[] printer){
+		for (int i=0;i<printer.length;i++){
+				System.out.print(printer[i] + "  " );
+			System.out.println();
+		}
+	}
 	public static void printList(ArrayList<Integer> p){
 		for (int i=0;i<p.size();i++){
 			System.out.print(p.get(i) + " ");
@@ -70,6 +98,14 @@ public class main {
 		System.out.println("");
 	}
 	public static void printDoubleArray(int[][] printer){
+		for (int i=0;i<printer.length;i++){
+			for(int j=0;j<printer[0].length;j++){
+				System.out.print(printer[i][j] + "  " );
+			}
+			System.out.println();
+		}
+	}
+	public static void printDoubleArray(double[][] printer){
 		for (int i=0;i<printer.length;i++){
 			for(int j=0;j<printer[0].length;j++){
 				System.out.print(printer[i][j] + "  " );
@@ -119,5 +155,19 @@ public class main {
 			}
 		}
 		return output;
+	}
+	
+	public static double getLength(int id, initializeData data){
+		String x = Integer.toString(id);
+		double length=0;
+		if (x.length() == 5){
+			ArrayList<trainComposition> comp = data.getCompositions();
+			for (int i = 0; i< comp.size(); i++){
+				if (comp.get(i).getID()==id){
+					length = comp.get(i).getLength();
+				}
+			}
+		}
+		return length;
 	}
 }

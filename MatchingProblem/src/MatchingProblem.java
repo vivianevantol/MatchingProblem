@@ -1,6 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.imageio.IIOException;
 import ilog.concert.*;
@@ -30,11 +31,11 @@ public class MatchingProblem {
 	public int[] nSameDepartures; //matches with arrival blocks
 	public int[] nSameArrivals; //matches with departure blocks
 
-	public MatchingProblem(int margin, initializeData data) throws IOException, IloException {
-		solveMe(margin, data);
+	public MatchingProblem(int maxTrack, int margin, initializeData data) throws IOException, IloException {
+		solveMe(maxTrack, margin, data);
 	}
 
-	public void solveMe(int margin, initializeData data) throws IOException, IloException {
+	public void solveMe(int maxTrack, int margin, initializeData data) throws IOException, IloException {
 		//lees benodigde data in
 		margin = margin; //how much time between arrival en departure
 		ArrayList<blocks> allblocks = new ArrayList<blocks>();
@@ -225,6 +226,17 @@ public class MatchingProblem {
 
 			//add constraints
 
+			//constraint length arrivals
+			for(int ba=0;ba<nArrivalBlock;ba++){
+				cplex.addLe(cplex.prod(arrivalblock[ba], arrivalblocks.get(ba).getLength()), maxTrack);
+			}
+			//constraint length departures
+			for(int ba=0;ba<nDepartureBlock;ba++){
+				cplex.addLe(cplex.prod(departureblock[ba], departureblocks.get(ba).getLength()), maxTrack);
+			}
+			
+			
+			
 			//constraint ui=1
 			IloLinearNumExpr[] sumUi = new IloLinearNumExpr[nArrivalTrain]; //for all arriving trains
 			for(int ti=0;ti<nArrivalTrain;ti++){//for all arriving trains
@@ -239,26 +251,6 @@ public class MatchingProblem {
 			}
 			
 			//constraint ui-ui=0
-//			IloLinearNumExpr[][] sumUiUi = new IloLinearNumExpr[nArrivalTrain][nNodes];
-//			for(int ti=0;ti<nArrivalTrain;ti++){//for all arriving trains
-//				IloLinearNumExpr[] sumUiUiTi = new IloLinearNumExpr[nIntermediatesA[ti]];
-//				for(int n=0;n<nIntermediatesA[ti];n++){ //this is only number value out of intermediatesA
-//					sumUiUiTi[n] = cplex.linearNumExpr();
-//						for(int i=0;i<nArcsOutHA[ti][n];i++){
-//							sumUiUiTi[n].addTerm(1.0, arrivalblock[ArcsOutHA.get(ti).get(n)[i]]);
-//						} //intermediates are in same order n=0 corresponds to intemediate 1
-//						for(int i=0;i<nArcsInHA[ti][n];i++){
-//							sumUiUiTi[n].addTerm(-1.0,  arrivalblock[ArcsInHA.get(ti).get(n)[i]]);
-//						}
-//				}
-//				sumUiUi[ti]=sumUiUiTi;
-//			}
-//			//add the constraint
-//			for(int ti=0;ti<nArrivalTrain;ti++){
-//				for(int n=0;n<nIntermediatesA[ti];n++){
-//						cplex.addEq(0, sumUiUi[ti][n]); 
-//				}
-//			}
 			IloLinearNumExpr[][] sumUiUiPos = new IloLinearNumExpr[nArrivalTrain][nNodes];
 			IloLinearNumExpr[][] sumUiUiNeg = new IloLinearNumExpr[nArrivalTrain][nNodes];
 			for(int ti=0;ti<nArrivalTrain;ti++){//for all arriving trains
@@ -299,26 +291,6 @@ public class MatchingProblem {
 			}
 			
 			//constraint vj-vj=0
-//			IloLinearNumExpr[][] sumVjVj = new IloLinearNumExpr[nDepartureTrain][nNodes];
-//			for(int tj=0;tj<nDepartureTrain;tj++){//for all arriving trains
-//				IloLinearNumExpr[] sumVjVjTj = new IloLinearNumExpr[nIntermediatesD[tj]];
-//				for(int n=0;n<nIntermediatesD[tj];n++){ //this is only number value out of intermediatesA
-//					sumVjVjTj[n] = cplex.linearNumExpr();
-//						for(int j=0;j<nArcsOutHD[tj][n];j++){
-//								sumVjVjTj[n].addTerm(1.0, departureblock[ArcsOutHD.get(tj).get(n)[j]]);
-//						} //intermediates are in same order n=0 corresponds to intemediate 1
-//						for(int j=0;j<nArcsInHD[tj][n];j++){
-//							sumVjVjTj[n].addTerm(-1.0,  departureblock[ArcsInHD.get(tj).get(n)[j]]);
-//						}
-//				}
-//				sumVjVj[tj]=sumVjVjTj;
-//			}
-//			//add the constraint
-//			for(int tj=0;tj<nDepartureTrain;tj++){
-//				for(int n=0;n<nIntermediatesD[tj];n++){
-//						cplex.addEq(0, sumVjVj[tj][n]); 
-//				}
-//			}
 			IloLinearNumExpr[][] sumVjVjPos = new IloLinearNumExpr[nDepartureTrain][nNodes];
 			IloLinearNumExpr[][] sumVjVjNeg = new IloLinearNumExpr[nDepartureTrain][nNodes];
 			for(int tj=0;tj<nDepartureTrain;tj++){//for all arriving trains
@@ -377,7 +349,7 @@ public class MatchingProblem {
 			if(cplex.solve()){
 				
 				int count = 0;
-				int[][] output = new int[(int) cplex.getValue(objective)][11];
+				int[][] output = new int[(int) cplex.getValue(objective)][12];
 				for(int i=0;i<nArrivalBlock;i++){
 					for(int j=0; j<nDepartureBlock;j++){
 						if(cplex.getValue(coupledblock[i][j])==1){ //blocks are coupled
@@ -410,13 +382,17 @@ public class MatchingProblem {
 							output[count][8] = (int) used.getCleaningTime();
 							output[count][9] = (int) used.getWashingTime();
 							output[count][10] = (int) used.getRepairTime();
+							output[count][11] = (int) used.getLength();
 							count++;
 						}
 					}
 				}
+				
+				
+				
 //				printDoubleArray(output);
-				writeExcel(output);
 				System.out.println("Problem Solved.");
+				writeExcel(output);
 			}
 			
 		} catch (IloException e){
@@ -479,6 +455,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 			double itime=0;
 			double rtime=0;
 			double wtime=0;
+			int length = (int)types.get(0).getLength();
 			if(c.get906a()){
 				track = 906;
 			}
@@ -494,7 +471,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 				}
 			}
 			double atime = itime + ctime + wtime + rtime;
-			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
+			blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime, length);
 			b.add(x);
 		}
 		if(compositionSize>1){
@@ -513,6 +490,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 				double itime =0;
 				double rtime =0;
 				double wtime =0;
+				int length = (int)types.get(0).getLength()+(int)types.get(1).getLength();
 				if(c.get906a()){
 					track = 906;
 				}
@@ -537,7 +515,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 					}
 				}
 				double atime = itime+ctime+wtime+rtime;
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime, length);
 				b.add(x);
 			}
 		}
@@ -558,6 +536,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 				double itime =0;
 				double rtime =0;
 				double wtime =0;
+				int length = (int)types.get(0).getLength()+(int)types.get(1).getLength()+(int)types.get(2).getLength();
 				double ctime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime();
 				if(c.get906a()){
 					track = 906;
@@ -592,7 +571,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 					}
 				}
 				double atime = itime+ctime+wtime+rtime;
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime, length);
 				b.add(x);
 			}
 		}
@@ -615,6 +594,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 				double itime =0;
 				double rtime =0;
 				double wtime =0;
+				int length = (int)types.get(0).getLength()+(int)types.get(1).getLength()+(int)types.get(2).getLength()+(int)types.get(3).getLength();
 				double ctime = types.get(0).getCleaningtime()+types.get(1).getCleaningtime()+types.get(2).getCleaningtime()+types.get(3).getCleaningtime();
 				if(c.get906a()){
 					track = 906;
@@ -658,7 +638,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 					}
 				}
 				double atime = itime + ctime + wtime + rtime;
-				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime);
+				blocks x = new blocks(arc, c.getID(), types, c.getTime(), track, atime, itime, ctime, wtime, rtime, length);
 				b.add(x);
 			}
 		}
@@ -825,6 +805,21 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 	}
 
 	public void writeExcel(int[][] matrix){
+		for(int i=0;i<matrix.length-1;i++){ //check coupling and decoupling
+			int[][] subblocks = Arrays.copyOfRange(matrix, i, matrix.length); //check same arrival or departure
+			for(int j=1;j<subblocks.length;j++){
+
+				if(matrix[i][3]==subblocks[j][3]){ //decoupling
+					matrix[i][3] = matrix[i][3]+2;
+					matrix[i+j][3] = matrix[i+j][3]+2;
+				}
+				if(matrix[i][4]==subblocks[j][4]){ //decoupling
+					matrix[i][4] = matrix[i][4]-3;
+					matrix[i+j][4] = matrix[i+j][4]-3;
+				}
+			}
+		}
+		
 		 FileWriter fileWriter = null;
 		 String FILE_HEADER = "Composition;ID A;ID D;Arrival;Departure;Track A;Track D";
 		 String COMMA_DELIMITER = ";"; //maybe this must be comma
@@ -837,12 +832,7 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 			 fileWriter.append(FILE_HEADER.toString());
 			 fileWriter.append(NEW_LINE_SEPARATOR);
 			 for(int i=0;i<matrix.length;i++){ //each line
-//				 for(int j=0;j<matrix[0].length-1;j++){ //each cel
-//					 fileWriter.append(Integer.toString(matrix[i][j]));
-//					 fileWriter.append(COMMA_DELIMITER);
-//				 }
-//				 fileWriter.append(Integer.toString(matrix[i][matrix[0].length-1]));
-//				 fileWriter.append(NEW_LINE_SEPARATOR);
+
 				 for(int j=0;j<matrix[0].length;j++){ //each cel
 					 fileWriter.append(Integer.toString(matrix[i][j]));
 					 fileWriter.append(COMMA_DELIMITER);
@@ -850,7 +840,6 @@ public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<block
 				 fileWriter.append(NEW_LINE_SEPARATOR);
 			 }
 		 } catch (Exception e) {
-			 
 		 } finally {
 			 try {
 				 fileWriter.flush();

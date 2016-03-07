@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import ilog.concert.IloException;
 
@@ -15,11 +16,37 @@ public class main {
 		initializeEventList eventList = new initializeEventList(); //create the eventlist
 		
 		int MatchingMargin = 0;
+		int maxBlock = 247;
 		try{ //directly prints output into "CompositionTimesMatching.csv"
-			MatchingProblem matching = new MatchingProblem(MatchingMargin, data);
+			MatchingProblem matching = new MatchingProblem(maxBlock, MatchingMargin, data);
 		} catch(IloException | IOException e) {
 			System.out.println("Error");
 		} 
+		
+//		int[][] test = {{1, 2},{2, 3},{3, 4},{4, 5},{5, 6}};
+//		printDoubleArray(test);
+//		printDoubleArray(Arrays.copyOfRange(test, 2, test.length));
+		
+//		int[][] blockdata = initializeBlockInfo(24);
+//		printDoubleArray(blockdata);
+//		
+//		for(int i=0;i<blockdata.length-1;i++){ //check coupling and decoupling
+//			int[][] subblocks = Arrays.copyOfRange(blockdata, i, blockdata.length); //check same arrival or departure
+//			for(int j=1;j<subblocks.length;j++){
+//
+//				if(blockdata[i][3]==subblocks[j][3]){ //decoupling
+//					blockdata[i][3] = blockdata[i][3]+2;
+//					blockdata[i+j][3] = blockdata[i+j][3]+2;
+//				}
+//				if(blockdata[i][4]==subblocks[j][4]){ //decoupling
+//					blockdata[i][4] = blockdata[i][4]-3;
+//					blockdata[i+j][4] = blockdata[i+j][4]-3;
+//				}
+//			}
+//		}
+//		printDoubleArray(blockdata);
+		
+		
 		
 //		int[][] departures = eventList.getDeparturelist();
 //		int[][] arrivals = eventList.getArrivallist();
@@ -177,4 +204,6 @@ public class main {
 		}
 		return length;
 	}
+	
+	
 }

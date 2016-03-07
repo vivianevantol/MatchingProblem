@@ -13,9 +13,10 @@ public class blocks {
 	private double washingTime;
 	private double cleaningTime;
 	private double repairTime;
+	private int length;
 
 	
-public blocks(int[] arc, int parent, ArrayList<trainType> types, int time, int track, double activityTime,  double inspectionTime, double cleaningTime, double washingTime, double repairTime){
+public blocks(int[] arc, int parent, ArrayList<trainType> types, int time, int track, double activityTime,  double inspectionTime, double cleaningTime, double washingTime, double repairTime, int length){
 		this.arc=arc;
 		this.parent =parent;
 		this.types = types;
@@ -26,10 +27,15 @@ public blocks(int[] arc, int parent, ArrayList<trainType> types, int time, int t
 		this.inspectionTime = inspectionTime;
 		this.cleaningTime = cleaningTime;
 		this.repairTime = repairTime;
+		this.length = length;
 	}
 	
 	public int[] getArc(){
 		return arc;
+	}
+	
+	public int getLength(){
+		return length;
 	}
 	
 	public double getActivityTime(){

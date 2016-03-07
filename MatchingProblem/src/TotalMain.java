@@ -21,6 +21,7 @@ public class TotalMain {
 
 		//GIVE INPUT===================================================================================
 		int MatchingMargin = 0;
+		int maxBlock = 247;
 		int nriterations = 1;
 
 		for (int i = 0; i < nriterations ; i++){
@@ -28,7 +29,7 @@ public class TotalMain {
 	
 		///EXECUTE MATCHING============================================================================
 			try{ //directly prints output into "CompositionTimesMatching.csv"
-				MatchingProblem matching = new MatchingProblem(MatchingMargin, data);
+				MatchingProblem matching = new MatchingProblem(maxBlock, MatchingMargin, data);
 			} catch(IloException | IOException e) {
 				System.out.println("Error");
 			} //Check what file is used in initializeEventList??!!
@@ -74,6 +75,7 @@ public class TotalMain {
 			}
 			//initialize all jobs (the cleaning platform jobs with repair on them)
 			int[][] blockdata = initializeBlockInfo(comps);
+			
 			for (int j=0; j<comps;j++){
 				int qj = maxD-blockdata[j][4]+blockdata[j][9]+2; //D-departure+wash+2
 				int rj = blockdata[j][3]+2; //arrival+2
@@ -176,10 +178,10 @@ public class TotalMain {
 	}
 
 	public static int[][] initializeBlockInfo(int blocks){
-		int[][] output = new int[blocks+1][11];
+		int[][] output = new int[blocks+1][12];
 
-		//		String csvFile = "CompositionTimesMatching.csv";
-		String csvFile = "CompositionTimes.csv";
+		String csvFile = "CompositionTimesMatching.csv";
+//		String csvFile = "CompositionTimes.csv";
 		BufferedReader br = null;
 		String cvsSplitBy = ";"; 
 		String line = "";
@@ -202,6 +204,7 @@ public class TotalMain {
 				output[count][8] = Integer.parseInt(data[8]); //C time
 				output[count][9] = Integer.parseInt(data[9]); //W time
 				output[count][10] = Integer.parseInt(data[10]);  //R time
+				output[count][11] = Integer.parseInt(data[11]);  //Length
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

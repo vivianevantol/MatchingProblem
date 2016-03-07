@@ -1,35 +1,19 @@
 import java.util.ArrayList;
 
 public class CreateAssignment {
-	private int[] Ub;
+	private int[] Ubfinal;
 	private int[] Vs;
 	private ArrayList<Integer> created;
 	
-	public CreateAssignment(int tryb, int trys, int[] Ub, int[] Vs, initializeEventList list, int[][] trainInfo, int[][] trackInfo){
-		this.Ub = Ub;
+	public CreateAssignment(int[][][] sides, int tryb, int trys, int[] Ubfinal, int[] Vs, initializeEventList list, int[][] trainInfo, int[][] trackInfo){
+		this.Ubfinal = Ubfinal;
 		this.Vs = Vs;
-		created = creation(tryb, trys, list, trainInfo, trackInfo);
+		created = creation(sides, tryb, trys, list, trainInfo, trackInfo);
 	}
 	
-	public ArrayList<Integer> creation(int tryb, int trys, initializeEventList list, int[][] trainInfo, int[][] trackInfo){
+	public ArrayList<Integer> creation(int[][][] sides, int tryb, int trys, initializeEventList list, int[][] trainInfo, int[][] trackInfo){
 		int[][] departures = list.getDeparturelist();
 		int[][] arrivals = list.getArrivallist();
-
-		
-		
-		//BUILD LIST SHOWING POSSIBLE ARRIVAL AND DEPARTURE SIDES=======================================================
-		int[][][] sides = new int[Vs.length][Ub.length][4]; //LL LR RL RR
-		for(int b=0;b<Ub.length;b++){
-			for(int s=0;s<Vs.length;s++){
-				if(departures[b][2]==906){
-					sides[s][b][1]=1; //LR
-				} else if(departures[b][2]==104){
-					sides[s][b][0]=1;//LL
-				} else {
-					System.out.println("Error tracks");
-				}
-			}
-		}
 		
 		//FIND MINUMUM DUAL VARIABLE TRACK an build==============================================================================
 		int minTrack = getMin(Vs, trys)[0]; //index, value --> this is the one you build on
@@ -41,9 +25,15 @@ public class CreateAssignment {
 		int currentLength =0;
 		int currentCapacity = trackInfo[minTrack][0];
 		int ubtried = 0;
+		
+		//copy UB
+		int[] Ub = new int[Ubfinal.length];
+		for(int i=0;i<Ubfinal.length;i++){
+			Ub[i]=Ubfinal[i];
+		}
+		
 		while(idle == true){
-			System.out.println("print UB");
-			printArray(Ub);
+//			System.out.println("print UB" +  ubtried);
 			int[] min = getMin(Ub, tryb, ubtried);
 			int minTrain = min[0]; //we want to add this train to the assignment
 			boolean add = checkFeasibility(minTrack, minTrain, currentNR, currentLength, trainInfo, currentCapacity, sides);
@@ -61,7 +51,7 @@ public class CreateAssignment {
 			if(currentLength>currentCapacity-70 || min[1]>100000){
 				idle = false;
 			}
-			if(ubtried>=Ub.length-1){
+			if(ubtried>=Ub.length-5){
 				idle = false;
 			}
 		}
@@ -78,22 +68,36 @@ public class CreateAssignment {
 	 */
 	public boolean checkFeasibility(int currentTrack, int train, ArrayList<Integer> currentNR,  int currentLength, int[][] trainInfo,  int currentCapacity, int[][][] sides){
 		boolean feasible = false;
-		if(currentCapacity>=currentLength+trainInfo[train][3]){ //don't look if length doesn't fit
+		int newLength = currentLength + trainInfo[train][3];
+		ArrayList<Integer> currentPresent = new ArrayList<Integer>();
+		currentPresent.add(currentNR.get(0)); //trains still on the track
+		for (int i=1;i<currentNR.size();i++){ //check which are departed to not include in length
+			if(trainInfo[currentNR.get(i)][2]<trainInfo[train][1]){
+				newLength = newLength - trainInfo[currentNR.get(i)][3];
+			} else {
+				currentPresent.add(currentNR.get(i));
+			}
+		}
+		if(currentPresent.size()==1){ //only track in assignment so no trains
+			feasible = true; //always add to empty assignment
+		}
+//		if(currentCapacity>=currentLength+trainInfo[train][3]){ //don't look if length doesn't fit
+		if(currentCapacity>=newLength && currentPresent.size()>1){ //don't look if length doesn't fit
 			//sides: [s] [b] [LL LR RL RR] --> we only have LL LR
 			//All trains arrive left
 			if(sides[currentTrack][train][1]==1){ //train departures right --> LR only of leaves after ALL TRAINS
-				if(trainInfo[train][2]>=trainInfo[currentNR.get(0)][2]){ //new train departs later
+				if(trainInfo[train][2]>=trainInfo[currentPresent.get(1)][2]){ //new train departs later
 					feasible=true;
 				}
-				if(sides[currentTrack][currentNR.get(0)][0]==1){
+				if(sides[currentTrack][currentPresent.get(1)][0]==1){
 					feasible = false; //CHECK WHETER THE LEFT TRAIN DEPART LEFT
 				}
 			} else { //train departs left --> LL
 				//IF first goes right side ALL GOOD
-				if(sides[currentTrack][currentNR.get(0)][1]==1){
+				if(sides[currentTrack][currentPresent.get(1)][1]==1){
 					feasible = true; //CHECK WHETER THE LEFT TRAIN DEPART RIGHT
 				} else { //ELSE if first goes left check departure time --> all good
-					if(trainInfo[train][2]<=trainInfo[currentNR.get(0)][2]){
+					if(trainInfo[train][2]<=trainInfo[currentPresent.get(1)][2]){
 						feasible = true;
 					}
 				}

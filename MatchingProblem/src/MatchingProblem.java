@@ -384,11 +384,15 @@ public class MatchingProblem {
 							trainComposition arrivalComp = getComposition(arrivalblocks.get(i).getParent(), allCompositions);
 							trainComposition departureComp = getComposition(departureblocks.get(j).getParent(), allCompositions);
 							int first = 0;
+							blocks used = null;
 //							System.out.println("Arrival: " + arrivalComp.getLength() + "  Departure: " + departureComp.getLength());
 							if(arrivalComp.getLength()<=departureComp.getLength() && arrivalComp.getLength()!=0){
 								first = arrivalComp.getID();
-							} else if (arrivalComp.getLength()>=departureComp.getLength() && departureComp.getLength()!=0) {
+								used = arrivalblocks.get(i);
+//							} else if (arrivalComp.getLength()>=departureComp.getLength() && departureComp.getLength()!=0) {
+							} else {
 								first = departureComp.getID();
+								used = departureblocks.get(j);
 							}
 							
 							output[count][0] = first;
@@ -398,10 +402,14 @@ public class MatchingProblem {
 							output[count][4] = departureblocks.get(j).getTime();
 							output[count][5] = arrivalblocks.get(i).getTrack();
 							output[count][6] = departureblocks.get(j).getTrack();
-							output[count][7] = (int) arrivalblocks.get(i).getInspectionTime();
-							output[count][8] = (int) arrivalblocks.get(i).getCleaningTime();
-							output[count][9] = (int) arrivalblocks.get(i).getWashingTime();
-							output[count][10] = (int) arrivalblocks.get(i).getRepairTime();
+//							output[count][7] = (int) arrivalblocks.get(i).getInspectionTime();
+//							output[count][8] = (int) arrivalblocks.get(i).getCleaningTime();
+//							output[count][9] = (int) arrivalblocks.get(i).getWashingTime();
+//							output[count][10] = (int) arrivalblocks.get(i).getRepairTime();
+							output[count][7] = (int) used.getInspectionTime();
+							output[count][8] = (int) used.getCleaningTime();
+							output[count][9] = (int) used.getWashingTime();
+							output[count][10] = (int) used.getRepairTime();
 							count++;
 						}
 					}

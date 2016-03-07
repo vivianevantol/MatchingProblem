@@ -14,17 +14,24 @@ public class main {
 		InitializeShuntingYard yard = new InitializeShuntingYard(); //create the shunting yard
 		initializeEventList eventList = new initializeEventList(); //create the eventlist
 		
-		int[][] departures = eventList.getDeparturelist();
-		int[][] arrivals = eventList.getArrivallist();
-		int[][] trainInfo = new int[22][4]; //ID Atime Dtime Length //22 is number of trains!!
-		for (int x=0;x<trainInfo.length;x++){ 
-			trainInfo[x][0] = departures[x][1];
-			trainInfo[x][1] = arrivals[x][0];
-			trainInfo[x][2] = departures[x][0];
-			trainInfo[x][3] = (int) getLength(departures[x][1], data);
-		}
+		int MatchingMargin = 0;
+		try{ //directly prints output into "CompositionTimesMatching.csv"
+			MatchingProblem matching = new MatchingProblem(MatchingMargin, data);
+		} catch(IloException | IOException e) {
+			System.out.println("Error");
+		} 
 		
-		printDoubleArray(trainInfo);
+//		int[][] departures = eventList.getDeparturelist();
+//		int[][] arrivals = eventList.getArrivallist();
+//		int[][] trainInfo = new int[22][4]; //ID Atime Dtime Length //22 is number of trains!!
+//		for (int x=0;x<trainInfo.length;x++){ 
+//			trainInfo[x][0] = departures[x][1];
+//			trainInfo[x][1] = arrivals[x][0];
+//			trainInfo[x][2] = departures[x][0];
+//			trainInfo[x][3] = (int) getLength(departures[x][1], data);
+//		}
+//		
+//		printDoubleArray(trainInfo);
 //		ArrayList<Track> tracks = yard.getTracks();
 //		int[][] trackInfo = new int[4][3]; //lengt left right
 //		for(int s=1;s<5;s++){ //the departure tracks!!

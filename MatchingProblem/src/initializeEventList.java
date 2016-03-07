@@ -31,7 +31,8 @@ public class initializeEventList {
 			arrivallist[j][0] = Integer.MAX_VALUE;		
 		}
 		
-		String csvFile = "CompositionTimes.csv";
+//		String csvFile = "CompositionTimes.csv";
+		String csvFile = "CompositionTimesMatching.csv";
 		BufferedReader br = null;
 		String cvsSplitBy = ";"; 
 		String line = "";
@@ -75,7 +76,8 @@ public class initializeEventList {
 			departurelist[j][0] = Integer.MAX_VALUE;		
 		}
 			
-		String csvFile = "CompositionTimes.csv";
+//		String csvFile = "CompositionTimes.csv";
+		String csvFile = "CompositionTimesMatching.csv";
 		BufferedReader br = null;
 		String cvsSplitBy = ";"; 
 		String line = "";

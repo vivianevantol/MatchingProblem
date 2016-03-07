@@ -71,9 +71,10 @@ public class mainParking {
 			
 			ArrayList<Integer> assignment = new ArrayList<Integer>();
 			while(foundnew==false && tryb<(trainInfo.length)){
+				trys = 0;
 				while(foundnew==false && trys<(trackInfo.length)){
 					assignment.clear();
-									System.out.println("TRYS: " + trys + " TRYB: " + tryb);
+					System.out.println("TRYS: " + trys + " TRYB: " + tryb);
 					CreateAssignment AssignmentObject = new CreateAssignment(tryb, trys, Ub, Vs, eventList, trainInfo, trackInfo);
 					assignment = AssignmentObject.getCreation(); //first is track rest is trainNR
 					//				System.out.println("Assignment created for track: " + assignment.get(0) );
@@ -97,10 +98,7 @@ public class mainParking {
 				}
 //			}
 
-			
-			
 
-			
 			//CHEAT FOR ITERATIONS INPUT========================
 			if(allA.size()>50){
 				allPos = true;

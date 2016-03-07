@@ -40,11 +40,10 @@ public class CreateAssignment {
 		currentNR.add(minTrack); //so track is in the assignment
 		int currentLength =0;
 		int currentCapacity = trackInfo[minTrack][0];
-		
+		int ubtried = 0;
 		while(idle == true){
 			System.out.println("print UB");
 			printArray(Ub);
-			int ubtried = 0;
 			int[] min = getMin(Ub, tryb, ubtried);
 			int minTrain = min[0]; //we want to add this train to the assignment
 			boolean add = checkFeasibility(minTrack, minTrain, currentNR, currentLength, trainInfo, currentCapacity, sides);

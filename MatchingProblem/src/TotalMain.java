@@ -51,6 +51,10 @@ public class TotalMain {
 				trackInfo[s][1] = 0;
 				trackInfo[s][2] = 0;
 			}
+//			System.out.println("Train");
+//			printDoubleArray(trainInfo);
+//			System.out.println("Track");
+//			printDoubleArray(trackInfo);
 			
 			//EXECUTE JOBSHOP===============================================================================
 			ArrayList<Jobs> allJobs = new ArrayList<Jobs>();
@@ -77,6 +81,10 @@ public class TotalMain {
 				int p2j = p1j;
 				allJobs.add(new Jobs(j+1,qj,rj,p1j,p2j, blockdata[j][0]));
 			}
+//			
+//			System.out.println("BlockData");
+//			printDoubleArray(blockdata);
+			
 			HeuristicJobShop jobshop = new HeuristicJobShop(allJobs, oneJobs, twoJobs);
 			int[][] output = jobshop.solver(); //this is already sorted on starting times
 			//		printDoubleArray(output);

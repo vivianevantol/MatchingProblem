@@ -16,7 +16,7 @@ public class main {
 		initializeEventList eventList = new initializeEventList(); //create the eventlist
 		
 		int MatchingMargin = 0;
-		int maxBlock = 247;
+		int maxBlock = 230;
 		try{ //directly prints output into "CompositionTimesMatching.csv"
 			MatchingProblem matching = new MatchingProblem(maxBlock, MatchingMargin, data);
 		} catch(IloException | IOException e) {

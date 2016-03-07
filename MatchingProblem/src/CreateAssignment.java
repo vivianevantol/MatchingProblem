@@ -34,6 +34,9 @@ public class CreateAssignment {
 		
 		while(idle == true){
 //			System.out.println("print UB" +  ubtried);
+			if(currentNR.size()>1){ //first train is assigned
+				tryb=0;
+			}
 			int[] min = getMin(Ub, tryb, ubtried);
 			int minTrain = min[0]; //we want to add this train to the assignment
 			boolean add = checkFeasibility(minTrack, minTrain, currentNR, currentLength, trainInfo, currentCapacity, sides);
@@ -81,28 +84,25 @@ public class CreateAssignment {
 		if(currentPresent.size()==1){ //only track in assignment so no trains
 			feasible = true; //always add to empty assignment
 		}
-//		if(currentCapacity>=currentLength+trainInfo[train][3]){ //don't look if length doesn't fit
 		if(currentCapacity>=newLength && currentPresent.size()>1){ //don't look if length doesn't fit
 			//sides: [s] [b] [LL LR RL RR] --> we only have LL LR
-			//All trains arrive left
-			if(sides[currentTrack][train][1]==1){ //train departures right --> LR only of leaves after ALL TRAINS
-				if(trainInfo[train][2]>=trainInfo[currentPresent.get(1)][2]){ //new train departs later
-					feasible=true;
-				}
-				if(sides[currentTrack][currentPresent.get(1)][0]==1){
-					feasible = false; //CHECK WHETER THE LEFT TRAIN DEPART LEFT
-				}
-			} else { //train departs left --> LL
-				//IF first goes right side ALL GOOD
-				if(sides[currentTrack][currentPresent.get(1)][1]==1){
-					feasible = true; //CHECK WHETER THE LEFT TRAIN DEPART RIGHT
-				} else { //ELSE if first goes left check departure time --> all good
-					if(trainInfo[train][2]<=trainInfo[currentPresent.get(1)][2]){
-						feasible = true;
+			//All trains arrive left and all trains can depart left (some also right)
+			//this is easiest check so always check whether new train can be LL (because if LR than also LL)
+			//only check if the train next to it can be LR
+				//IF first can go right side ALL GOOD
+				feasible = true;
+				for(int i=1;i<currentPresent.size();i++){
+					if(sides[currentTrack][currentPresent.get(i)][1]!=1){
+						feasible = false; //first cannot leave right side
+					}
+					if(i>1 && trainInfo[currentPresent.get(i-1)][2]<trainInfo[currentPresent.get(i)][2]){
+						feasible = false; //not in order departure so cannot all leave right side
 					}
 				}
+				if(trainInfo[currentPresent.get(1)][2]>trainInfo[train][2]){
+					feasible = true; //first train can follow to leave left
+				}
 			}
-		}
 		return feasible;
 	}
 

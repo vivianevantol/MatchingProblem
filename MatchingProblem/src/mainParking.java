@@ -24,6 +24,13 @@ public class mainParking {
 			trainInfo[x][2] = departures[x][0];
 			trainInfo[x][3] = (int) getLength(departures[x][1], data);
 		}
+//		int[][] trainInfo = new int[7][4]; //ID Atime Dtime Length //22 is number of trains!!
+//		for (int x=0;x<trainInfo.length;x++){ 
+//			trainInfo[x][0] = departures[x][1];
+//			trainInfo[x][1] = arrivals[x][0];
+//			trainInfo[x][2] = departures[x][0];
+//			trainInfo[x][3] = (int) getLength(departures[x][1], data);
+//		}
 //		ArrayList<Track> tracks = yard.getTracks();
 //		int[][] trackInfo = new int[4][3]; //lengt left right
 //		for(int s=1;s<5;s++){ //the departure tracks!!
@@ -32,20 +39,20 @@ public class mainParking {
 //			trackInfo[s-1][2] = 0;
 //		}
 		ArrayList<Track> tracks = yard.getTracks();
-		int[][] trackInfo = new int[6][3]; //lengt left right
-		for(int s=1;s<7;s++){ //the departure tracks!!
+		int[][] trackInfo = new int[8][3]; //lengt left right
+		for(int s=1;s<9;s++){ //the departure tracks!!
 			trackInfo[s-1][0] = (int) tracks.get(s).getLength(); 
 			trackInfo[s-1][1] = 0;
 			trackInfo[s-1][2] = 0;
 		}
 		
-		//BUILD LIST SHOWING POSSIBLE ARRIVAL AND DEPARTURE SIDES=======================================================
+//===========BUILD LIST SHOWING POSSIBLE ARRIVAL AND DEPARTURE SIDES=======================================================
 		int[][][] sides = new int[trackInfo.length][trainInfo.length][4]; //LL LR RL RR
 		for(int b=0;b<trainInfo.length;b++){
 			for(int s=0;s<trackInfo.length;s++){
 				if(departures[b][2]==906){
 					sides[s][b][1]=1; //LR
-//					sides[s][b][0]=1; //LL
+					sides[s][b][0]=1; //LL
 				} else if(departures[b][2]==104){
 					sides[s][b][0]=1;//LL
 				} else {
@@ -60,14 +67,23 @@ public class mainParking {
 		int[] AssTrack = new int[trackInfo.length];
 		int[][] AssTrackTrain = new int[trackInfo.length][trainInfo.length];
 		
-		//INITIALIZE SET COVERING PROBLEM
+//==============INITIALIZE SET COVERING PROBLEM======================================================================
 		System.out.println("Iteration Creation " + (allA.size()+1));
 		ParkingSetCovering ParkingInitialize = new ParkingSetCovering(true, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
+		ParkingSetCovering ParkingMIPinitialize = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 		double[] output = ParkingInitialize.getDuals();
+		int[] outputMIP = ParkingMIPinitialize.getPenalty();
 		int[] Ub = new int[trainInfo.length];
 		int[] Vs = new int[trackInfo.length];
+//		for(int b=0;b<Ub.length;b++){
+//			Ub[b] = (int) output[b];
+//		}
 		for(int b=0;b<Ub.length;b++){
-			Ub[b] = (int) output[b];
+			if(outputMIP[b]==1){
+				Ub[b] = -1;
+			} else {
+				Ub[b] = 1;
+			}
 		}
 		for(int s=0;s<Vs.length;s++){
 			Vs[s] = (int) output[Ub.length+s];
@@ -75,19 +91,18 @@ public class mainParking {
 		}
 		
 		boolean allPos = false; //Checks wheter all duals are positive
+		int iterations = 0;
 		while(allPos==false){
-
-			//=====CREATE THE MOST VALUABLE ASSIGNMENT=========================================================================
+//==============CREATE THE MOST VALUABLE ASSIGNMENT=========================================================================
 			int trys=0;
 			int tryb=0;
 			boolean foundnew = false;
-			
+			iterations++;
 			ArrayList<Integer> assignment = new ArrayList<Integer>();
-			while(foundnew==false && tryb<(trainInfo.length)){
+			while(foundnew==false && tryb<(trainInfo.length)){  //try all trains
 				trys = 0;
-				while(foundnew==false && trys<(trackInfo.length)){
+				while(foundnew==false && trys<(trackInfo.length)){ //try all tracks
 					assignment.clear();
-//					System.out.println("TRYS: " + trys + " TRYB: " + tryb);
 					CreateAssignment AssignmentObject = new CreateAssignment(sides, tryb, trys, Ub, Vs, eventList, trainInfo, trackInfo);
 					assignment = AssignmentObject.getCreation(); //first is track rest is trainNR
 					//				System.out.println("Assignment created for track: " + assignment.get(0) );
@@ -101,7 +116,7 @@ public class mainParking {
 				}
 				tryb++;
 			}
-//			if(foundnew){
+			if(foundnew){
 				allA.add(assignment);
 				AssTrack[assignment.get(0)] = AssTrack[assignment.get(0)]+1;
 				for(int b=0;b<trainInfo.length;b++){
@@ -109,31 +124,38 @@ public class mainParking {
 						AssTrackTrain[assignment.get(0)][b] = AssTrackTrain[assignment.get(0)][b]+1;
 					}
 				}
-//			}
+			}
 
 
 				//=====RUN THE PARKING SET COVERING PROBLEM=======================================================================
 				System.out.println("Iteration Creation " + (allA.size()+1));
 				ParkingSetCovering Parking = new ParkingSetCovering(true, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
-//				double[] output = Parking.getDuals();
+				ParkingSetCovering ParkingMIP = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 				output = Parking.getDuals();
-//				int[] Ub = new int[trainInfo.length];
-//				int[] Vs = new int[trackInfo.length];
+				outputMIP = ParkingMIP.getPenalty();
+//				for(int b=0;b<Ub.length;b++){
+//					Ub[b] = (int) output[b];
+//				}
 				for(int b=0;b<Ub.length;b++){
-					Ub[b] = (int) output[b];
+					if(outputMIP[b]==1){
+						Ub[b] = -1;
+					} else {
+						Ub[b] = 1;
+					}
 				}
 				for(int s=0;s<Vs.length;s++){
 					Vs[s] = (int) output[Ub.length+s];
 					//					if(output[Ub.length+s]<0){allPos = false;}
 				}
-				System.out.println("UB");
-				printArray(Ub);
-				System.out.println("VS");
-				printArray(Vs);
+				
+//				System.out.println("UB");
+//				printArray(Ub);
+//				System.out.println("VS");
+//				printArray(Vs);
 
 				
 			//CHEAT FOR ITERATIONS INPUT========================
-			if(allA.size()>300){
+			if(iterations>1000){
 				allPos = true;
 			}
 		}

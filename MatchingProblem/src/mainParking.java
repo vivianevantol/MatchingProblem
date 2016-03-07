@@ -13,34 +13,25 @@ public class mainParking {
 		InitializeShuntingYard yard = new InitializeShuntingYard(); //create the shunting yard
 		initializeEventList eventList = new initializeEventList(); //create the eventlist
 		
-		//INITIALIZE DATA=====================================================================================================
+//===========INITIALIZE DATA================================================================================================
 		
 		int[][] departures = eventList.getDeparturelist();
 		int[][] arrivals = eventList.getArrivallist();
-		int[][] trainInfo = new int[22][4]; //ID Atime Dtime Length //22 is number of trains!!
+		int nTracks = 8; //input!!
+		int nTrains = 22;
+		int nIterations = 5;
+		
+		
+		int[][] trainInfo = new int[nTrains][4]; //ID Atime Dtime Length //22 is number of trains!!
 		for (int x=0;x<trainInfo.length;x++){ 
 			trainInfo[x][0] = departures[x][1];
 			trainInfo[x][1] = arrivals[x][0];
 			trainInfo[x][2] = departures[x][0];
 			trainInfo[x][3] = (int) getLength(departures[x][1], data);
 		}
-//		int[][] trainInfo = new int[7][4]; //ID Atime Dtime Length //22 is number of trains!!
-//		for (int x=0;x<trainInfo.length;x++){ 
-//			trainInfo[x][0] = departures[x][1];
-//			trainInfo[x][1] = arrivals[x][0];
-//			trainInfo[x][2] = departures[x][0];
-//			trainInfo[x][3] = (int) getLength(departures[x][1], data);
-//		}
-//		ArrayList<Track> tracks = yard.getTracks();
-//		int[][] trackInfo = new int[4][3]; //lengt left right
-//		for(int s=1;s<5;s++){ //the departure tracks!!
-//			trackInfo[s-1][0] = (int) tracks.get(s).getLength(); 
-//			trackInfo[s-1][1] = 0;
-//			trackInfo[s-1][2] = 0;
-//		}
 		ArrayList<Track> tracks = yard.getTracks();
-		int[][] trackInfo = new int[8][3]; //lengt left right
-		for(int s=1;s<9;s++){ //the departure tracks!!
+		int[][] trackInfo = new int[nTracks][3]; //lengt left right
+		for(int s=1;s<1+nTracks;s++){ //the departure tracks!!
 			trackInfo[s-1][0] = (int) tracks.get(s).getLength(); 
 			trackInfo[s-1][1] = 0;
 			trackInfo[s-1][2] = 0;
@@ -68,31 +59,39 @@ public class mainParking {
 		int[][] AssTrackTrain = new int[trackInfo.length][trainInfo.length];
 		
 //==============INITIALIZE SET COVERING PROBLEM======================================================================
-		System.out.println("Iteration Creation " + (allA.size()+1));
+		System.out.println("Initialization model===========================================================");
 		ParkingSetCovering ParkingInitialize = new ParkingSetCovering(true, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
-		ParkingSetCovering ParkingMIPinitialize = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
+//		ParkingSetCovering ParkingMIPinitialize = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 		double[] output = ParkingInitialize.getDuals();
-		int[] outputMIP = ParkingMIPinitialize.getPenalty();
+//		int[] outputMIP = ParkingMIPinitialize.getPenalty();
 		int[] Ub = new int[trainInfo.length];
 		int[] Vs = new int[trackInfo.length];
-//		for(int b=0;b<Ub.length;b++){
-//			Ub[b] = (int) output[b];
-//		}
 		for(int b=0;b<Ub.length;b++){
-			if(outputMIP[b]==1){
-				Ub[b] = -1;
-			} else {
-				Ub[b] = 1;
-			}
+			Ub[b] = -(int) output[b];
 		}
+//		for(int b=0;b<Ub.length;b++){
+//			if(outputMIP[b]==1){
+//				Ub[b] = -1;
+		
+//			} else {
+//				Ub[b] = 1;
+//			}
+//		}
 		for(int s=0;s<Vs.length;s++){
-			Vs[s] = (int) output[Ub.length+s];
+			Vs[s] = -(int) output[Ub.length+s];
 //			if(output[Ub.length+s]<0){allPos = false;}
 		}
 		
+		System.out.println("UB");
+		printArray(Ub);
+		System.out.println("VS");
+		printArray(Vs);
+		
 		boolean allPos = false; //Checks wheter all duals are positive
-		int iterations = 0;
+		int iterations = 1;
 		while(allPos==false){
+			System.out.println("=========================================================================================");
+			System.out.println("Iteration " + iterations);
 //==============CREATE THE MOST VALUABLE ASSIGNMENT=========================================================================
 			int trys=0;
 			int tryb=0;
@@ -108,7 +107,7 @@ public class mainParking {
 					//				System.out.println("Assignment created for track: " + assignment.get(0) );
 					//				printList(assignment);
 					if(!allA.contains(assignment)){
-						System.out.println("XX");
+						System.out.println("New assignment");
 						printList(assignment);
 						foundnew = true;
 					}
@@ -125,48 +124,53 @@ public class mainParking {
 					}
 				}
 			}
+			
+			//CHEAT FOR ITERATIONS INPUT========================
+			if(iterations>=nIterations){
+				allPos = true;
+			}
 
 
-				//=====RUN THE PARKING SET COVERING PROBLEM=======================================================================
-				System.out.println("Iteration Creation " + (allA.size()+1));
-				ParkingSetCovering Parking = new ParkingSetCovering(true, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
-				ParkingSetCovering ParkingMIP = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
+//=====RUN THE PARKING SET COVERING PROBLEM=======================================================================
+			if(!allPos){
+	
+			ParkingSetCovering Parking = new ParkingSetCovering(true, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
+//				ParkingSetCovering ParkingMIP = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 				output = Parking.getDuals();
-				outputMIP = ParkingMIP.getPenalty();
-//				for(int b=0;b<Ub.length;b++){
-//					Ub[b] = (int) output[b];
-//				}
+//				outputMIP = ParkingMIP.getPenalty();
 				for(int b=0;b<Ub.length;b++){
-					if(outputMIP[b]==1){
-						Ub[b] = -1;
-					} else {
-						Ub[b] = 1;
-					}
+					Ub[b] = -(int) output[b];
 				}
+//				for(int b=0;b<Ub.length;b++){
+//					if(outputMIP[b]==1){
+//						Ub[b] = -1;
+//					} else {
+//						Ub[b] = 1;
+//					}
+//				}
 				for(int s=0;s<Vs.length;s++){
-					Vs[s] = (int) output[Ub.length+s];
+					Vs[s] = -(int) output[Ub.length+s];
 					//					if(output[Ub.length+s]<0){allPos = false;}
 				}
 				
-//				System.out.println("UB");
-//				printArray(Ub);
-//				System.out.println("VS");
-//				printArray(Vs);
-
-				
-			//CHEAT FOR ITERATIONS INPUT========================
-			if(iterations>1000){
-				allPos = true;
+				System.out.println("UB");
+				printArray(Ub);
+				System.out.println("VS");
+				printArray(Vs);
 			}
+				
+
 		}
 
-		System.out.println("Assignments");
+		System.out.println();
+		System.out.println("All assignments");
 		for(int i=0;i<allA.size();i++){
 			printList(allA.get(i));
 		}
 		
 		System.out.println();
 		System.out.println("Out of while");
+		System.out.println("Final MIP model===========================================================");
 		ParkingSetCovering ParkingFinal = new ParkingSetCovering(false, allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 		int[] Assignments = ParkingFinal.getAssignments();
 		int[] Penalties = ParkingFinal.getPenalty();
@@ -189,25 +193,47 @@ public class mainParking {
 		return check;
 	}
 	public static int[] getMin(int[] x, int trys){
+//		int[] y= new int[x.length];
+//		for (int i=0;i<x.length;i++){
+//			y[i] = x[i];
+//		}
+//		int now = -1;
+//		
+//		int minvalue = 800000;
+//		int index = -1;
+//		while(now!=trys){
+//			now++;
+//			minvalue = Integer.MAX_VALUE;
+//			index = -1;
+//			for (int i=0;i<x.length;i++){
+//				if(x[i]<minvalue){
+//					index = i;
+//					minvalue = x[i];
+//				}
+//			}
+//			x[index] = Integer.MAX_VALUE;
+//		}
+//		int[] yy = {index, minvalue};
+//		return yy;
 		int[] y= new int[x.length];
 		for (int i=0;i<x.length;i++){
 			y[i] = x[i];
 		}
 		int now = -1;
 		
-		int minvalue = 800000;
+		int minvalue = -800000;
 		int index = -1;
 		while(now!=trys){
 			now++;
-			minvalue = Integer.MAX_VALUE;
+			minvalue = -Integer.MAX_VALUE;
 			index = -1;
 			for (int i=0;i<x.length;i++){
-				if(x[i]<minvalue){
+				if(x[i]>minvalue){
 					index = i;
 					minvalue = x[i];
 				}
 			}
-			x[index] = Integer.MAX_VALUE;
+			x[index] = -Integer.MAX_VALUE;
 		}
 		int[] yy = {index, minvalue};
 		return yy;

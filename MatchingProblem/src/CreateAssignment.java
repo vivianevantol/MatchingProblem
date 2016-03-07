@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 public class CreateAssignment {
 	private int[] Ubfinal;
@@ -33,12 +34,21 @@ public class CreateAssignment {
 		}
 		
 		while(idle == true){
+			int minTrain = 0;
 //			System.out.println("print UB" +  ubtried);
 			if(currentNR.size()>1){ //first train is assigned
 				tryb=0;
 			}
+//			if(currentNR.size()>3){ //two trains have been added
+//				Random randomGenerator = new Random();
+//				minTrain = randomGenerator.nextInt(Ub.length);
+//			} else {
+//				int[] min = getMin(Ub, tryb, ubtried);
+//				minTrain = min[0];
+//			}
+			
 			int[] min = getMin(Ub, tryb, ubtried);
-			int minTrain = min[0]; //we want to add this train to the assignment
+			minTrain = min[0]; //we want to add this train to the assignment
 			boolean add = checkFeasibility(minTrack, minTrain, currentNR, currentLength, trainInfo, currentCapacity, sides);
 			if(add){
 //				currentID.add(trainInfo[minTrain][0]);

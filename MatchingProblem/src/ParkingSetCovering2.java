@@ -17,11 +17,11 @@ public class ParkingSetCovering2{
 
 	public double[] duals;
 	public int[][] XSK;
-	public int[] XK;
-	public int[] YB;
+	public double[] XK;
+	public double[] YB;
 
-	public ParkingSetCovering2(boolean fixed, ArrayList<ArrayList<Integer>> allA, int Tracks, int Trains, int[] AssTrack, int[][] AssTrackTrain, int[][] trainInfo) throws IOException, IloException {
-		solveMe(fixed, allA, Tracks, Trains, AssTrack, AssTrackTrain, trainInfo);
+	public ParkingSetCovering2(ArrayList<ArrayList<Integer>> allA, int Tracks, int Trains, int[] AssTrack, int[][] AssTrackTrain, int[][] trainInfo) throws IOException, IloException {
+		solveMe(allA, Tracks, Trains, AssTrack, AssTrackTrain, trainInfo);
 		//allA is trackNR trainNR trainNR trainNR...
 	}
 
@@ -41,7 +41,7 @@ public class ParkingSetCovering2{
 	 * cks = costs of assigning k on s
 	 * d = penalty if block not assigned
 	 */
-	public void solveMe(boolean fixed, ArrayList<ArrayList<Integer>> allA, int Tracks, int Trains, int[] AssTrack, int[][] AssTrackTrain, int[][] trainInfo) throws IOException, IloException {
+	public void solveMe(ArrayList<ArrayList<Integer>> allA, int Tracks, int Trains, int[] AssTrack, int[][] AssTrackTrain, int[][] trainInfo) throws IOException, IloException {
 		/*
 		 * data uit dynamic programming ArrayList<ArrayList<ArrayList<ArrayList<int>>>>() assignments
 		 * assignments.get(track).get(block).get(assignment).get(id)=int
@@ -77,9 +77,9 @@ public class ParkingSetCovering2{
 		this.nAssignments = AssTrack; //# ass per track SIZE Ks
 		this.nAssignmentsTrains = AssTrackTrain; //# assignments containing b SIZE Ksb
 		penalty=1;
-		this.YB =  new int[nTrains];
+		this.YB =  new double[nTrains];
 		this.XSK = new int[nTracks][nTotalAssignments];
-		this.XK = new int[nTotalAssignments];
+		this.XK = new double[nTotalAssignments];
 
 
 		//initialize sets S, B, Kb, Kbs=============================================================================================
@@ -114,13 +114,13 @@ public class ParkingSetCovering2{
 //			}
 //		}
 
-		System.out.println("nTracks: " + nTracks);
-		System.out.println("nTrains: " + nTrains);
-		System.out.println("nTotalAssignments: " + nTotalAssignments);
-		System.out.println("nAssignments");
-		printArray(nAssignments);
-		System.out.println("nAssignmentTrains");
-		printDoubleArray(nAssignmentsTrains);
+//		System.out.println("nTracks: " + nTracks);
+//		System.out.println("nTrains: " + nTrains);
+//		System.out.println("nTotalAssignments: " + nTotalAssignments);
+//		System.out.println("nAssignments");
+//		printArray(nAssignments);
+//		System.out.println("nAssignmentTrains");
+//		printDoubleArray(nAssignmentsTrains);
 
 		try{
 			//define new model
@@ -129,23 +129,12 @@ public class ParkingSetCovering2{
 			//decision variables
 
 //			IloNumVar[][] xsk = new IloNumVar[nTracks][nTotalAssignments];
+//			System.out.println(nTotalAssignments);
 			IloNumVar[] xk = new IloNumVar[nTotalAssignments];
 			IloNumVar[] yb = new IloNumVar[nTrains];
 			
-			if(!fixed){
-				//making all variables boolean
-				yb = cplex.boolVarArray(nTrains); //for every train
-				xk = cplex.boolVarArray(nTotalAssignments);
-//				for (int i=0;i<nTracks;i++){
-//					xsk[i] = cplex.boolVarArray(nTotalAssignments); //for every track for every assignment
-//				}
-			} else {
-				yb = cplex.numVarArray(nTrains, 0.0, 1.0);
-				xk = cplex.numVarArray(nTrains, 0.0, 1.0);
-//				for (int i=0;i<nTracks;i++){
-//					xsk[i] = cplex.numVarArray(nTotalAssignments, 0.0, 1.0); //for every track for every assignment
-//				}
-			}
+			yb = cplex.numVarArray(nTrains, 0.0, Double.MAX_VALUE);
+			xk = cplex.numVarArray(nTotalAssignments, 0.0, Double.MAX_VALUE);
 
 			//define objective
 			IloLinearNumExpr objective = cplex.linearNumExpr();
@@ -173,6 +162,7 @@ public class ParkingSetCovering2{
 						//Ksb.get(s).get(b) as a set
 						if(!Ksb.get(s).get(b).isEmpty()){
 //							constraint1[b].addTerm(1, xsk[s][Ksb.get(s).get(b).get(k)]);
+//							System.out.println("Size: " + nTotalAssignments + " value " + Ksb.get(s).get(b).get(k));
 							constraint1[b].addTerm(1, xk[Ksb.get(s).get(b).get(k)]);
 						}
 					}
@@ -180,7 +170,8 @@ public class ParkingSetCovering2{
 				constraint1[b].addTerm(1, yb[b]);
 			}
 			for(int b=0;b<nTrains;b++){
-				constraints.add(cplex.addEq(1, constraint1[b]));
+//				constraints.add(cplex.addEq(1, constraint1[b]));
+				constraints.add(cplex.addGe(constraint1[b], 1));
 			}
 
 			//constraint2 sum_xsk <=1
@@ -204,10 +195,9 @@ public class ParkingSetCovering2{
 				}
 			}
 
-			cplex.exportModel("ParkingProblem.lp");
+			cplex.exportModel("ParkingProblemModelRelaxed.lp");
 			System.out.println("Model exported");
 
-			if(fixed){
 				if(cplex.solve()){
 					this.duals = new double[nTrains+nTracks];
 					for(int i=0;i<constraints.size();i++){
@@ -215,27 +205,20 @@ public class ParkingSetCovering2{
 					}
 					System.out.println("Fixed Problem Solved: Duals returned");
 					System.out.println("Objective: " + cplex.getValue(objective));
-				}
-			} else {
-				if(cplex.solve()){
-					this.duals = new double[nTrains+nTracks];
-					for(int i=0;i<constraints.size();i++){
-						duals[i] = cplex.getSlack(constraints.get(i));
-					}
-					System.out.println("Problem Solved: Slack returned");
-					System.out.println("Objective: " + cplex.getValue(objective));
-
+					
 					for(int b=0;b<nTrains;b++){
-						YB[b] = (int) cplex.getValue(yb[b]);
+						YB[b] = cplex.getValue(yb[b]);
 					}
 					for (int s=0;s<nTracks;s++){
 						for(int k=0;k<nTotalAssignments;k++){
-//							XSK[s][k] = (int) cplex.getValue(xsk[s][k]); //for every track for every assignment
-							XK[k] = (int) cplex.getValue(xk[k]); //for every track for every assignment
+							XK[k] = cplex.getValue(xk[k]); //for every track for every assignment
 						}
 					}
+//					System.out.println("YB");
+//					printArray(YB);
+//					System.out.println("XK");
+//					printArray(XK);
 				}
-			}
 
 		} catch (IloException e) {
 			System.out.print("Catch clause" + e);
@@ -260,11 +243,11 @@ public class ParkingSetCovering2{
 		return duals;
 	}
 	
-	public int[] getAssignments(){
+	public double[] getAssignments(){
 		return XK;
 	}
 	
-	public int[] getPenalty(){
+	public double[] getPenalty(){
 		return YB;
 	}
 	
@@ -277,7 +260,14 @@ public class ParkingSetCovering2{
 		}
 	}
 	
-	public static void printArray(int[] printer){
+//	public static void printArray(int[] printer){
+//		for (int i=0;i<printer.length;i++){
+//				System.out.print(printer[i] + "  " );
+//			System.out.println();
+//		}
+//	}
+	
+	public static void printArray(double[] printer){
 		for (int i=0;i<printer.length;i++){
 				System.out.print(printer[i] + "  " );
 			System.out.println();

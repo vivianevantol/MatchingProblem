@@ -5,6 +5,7 @@ public class CreateAssignment {
 	private int[] Ubfinal;
 	private int[] Vs;
 	private ArrayList<Integer> created;
+	private int newLength; //the length adjusted for departed trains
 	
 	public CreateAssignment(int[][][] sides, int tryb, int trys, int[] Ubfinal, int[] Vs, initializeEventList list, int[][] trainInfo, int[][] trackInfo){
 		this.Ubfinal = Ubfinal;
@@ -13,8 +14,8 @@ public class CreateAssignment {
 	}
 	
 	public ArrayList<Integer> creation(int[][][] sides, int tryb, int trys, initializeEventList list, int[][] trainInfo, int[][] trackInfo){
-		int[][] departures = list.getDeparturelist();
-		int[][] arrivals = list.getArrivallist();
+//		int[][] departures = list.getDeparturelist();
+//		int[][] arrivals = list.getArrivallist();
 		
 		//FIND MINUMUM DUAL VARIABLE TRACK an build==============================================================================
 		int minTrack = getMin(Vs, trys)[0]; //index, value --> this is the one you build on
@@ -24,6 +25,7 @@ public class CreateAssignment {
 		ArrayList<Integer> currentNR = new ArrayList<Integer>(); //still empty
 		currentNR.add(minTrack); //so track is in the assignment
 		int currentLength =0;
+		int currentPresentLength=0;
 		int currentCapacity = trackInfo[minTrack][0];
 		int ubtried = 0;
 		
@@ -32,14 +34,14 @@ public class CreateAssignment {
 		for(int i=0;i<Ubfinal.length;i++){
 			Ub[i]=Ubfinal[i];
 		}
-		
+
 		while(idle == true){
 			int minTrain = 0;
 //			System.out.println("print UB" +  ubtried);
 			if(currentNR.size()>1){ //first train is assigned
 				tryb=0;
 			}
-//			if(currentNR.size()>3){ //two trains have been added
+//			if(currentNR.size()>0){ //two trains have been added
 //				Random randomGenerator = new Random();
 //				minTrain = randomGenerator.nextInt(Ub.length);
 //			} else {
@@ -48,11 +50,18 @@ public class CreateAssignment {
 //			}
 			
 			int[] min = getMin(Ub, tryb, ubtried);
-			minTrain = min[0]; //we want to add this train to the assignment
+			Random randomGenerator = new Random();
+			int randomChoice = randomGenerator.nextInt(10);
+			if(randomChoice>2){ //20% change of taking the random value
+				minTrain = min[0]; //we want to add this train to the assignment
+			} else {
+				minTrain = randomGenerator.nextInt(Ub.length);
+			}
+//			minTrain = min[0]; //we want to add this train to the assignment
 			boolean add = checkFeasibility(minTrack, minTrain, currentNR, currentLength, trainInfo, currentCapacity, sides);
-			if(add){
-//				currentID.add(trainInfo[minTrain][0]);
-				currentNR.add(minTrain);
+			if(add){ //need to call newLength
+				currentPresentLength = getNewLength();
+				currentNR.add(1, minTrain);
 				currentLength = currentLength + trainInfo[minTrain][3];
 				Ub[minTrain] = Integer.MAX_VALUE; //dont add twice
 				ubtried++;
@@ -61,14 +70,18 @@ public class CreateAssignment {
 				ubtried++;
 			}
 			
-			if(currentLength>currentCapacity-70 || min[1]>100000){
-				idle = false;
-			}
-			if(ubtried>=Ub.length-5){
+//			if(currentPresentLength>currentCapacity-70 || min[1]>100000){
+//				idle = false;
+//			}
+			if(ubtried>=Ub.length){ //|| min[1]>100000
 				idle = false;
 			}
 		}
 		return currentNR;
+	}
+	
+	public int getNewLength(){
+		return newLength;
 	}
 	
 	/*
@@ -81,19 +94,23 @@ public class CreateAssignment {
 	 */
 	public boolean checkFeasibility(int currentTrack, int train, ArrayList<Integer> currentNR,  int currentLength, int[][] trainInfo,  int currentCapacity, int[][][] sides){
 		boolean feasible = false;
-		int newLength = currentLength + trainInfo[train][3];
+		int newLength = currentLength + trainInfo[train][3]; //if all trains were present
 		ArrayList<Integer> currentPresent = new ArrayList<Integer>();
-		currentPresent.add(currentNR.get(0)); //trains still on the track
+		currentPresent.add(currentNR.get(0)); //trains still on same the track
 		for (int i=1;i<currentNR.size();i++){ //check which are departed to not include in length
 			if(trainInfo[currentNR.get(i)][2]<trainInfo[train][1]){
+//				System.out.println("Adjust length with: " + trainInfo[currentNR.get(i)][3]);
 				newLength = newLength - trainInfo[currentNR.get(i)][3];
 			} else {
 				currentPresent.add(currentNR.get(i));
 			}
 		}
 		if(currentPresent.size()==1){ //only track in assignment so no trains
-			feasible = true; //always add to empty assignment
+			if(trainInfo[train][3]<=currentCapacity){
+				feasible = true; //always add to empty assignment
+			}
 		}
+
 		if(currentCapacity>=newLength && currentPresent.size()>1){ //don't look if length doesn't fit
 			//sides: [s] [b] [LL LR RL RR] --> we only have LL LR
 			//All trains arrive left and all trains can depart left (some also right)
@@ -101,7 +118,7 @@ public class CreateAssignment {
 			//only check if the train next to it can be LR
 				//IF first can go right side ALL GOOD
 				feasible = true;
-				for(int i=1;i<currentPresent.size();i++){
+				for(int i=1;i<currentPresent.size();i++){ //can they all leave right
 					if(sides[currentTrack][currentPresent.get(i)][1]!=1){
 						feasible = false; //first cannot leave right side
 					}
@@ -113,6 +130,10 @@ public class CreateAssignment {
 					feasible = true; //first train can follow to leave left
 				}
 			}
+		if(feasible){
+			this.newLength = newLength;
+//			System.out.println("CurrentLength: " + newLength);
+		}
 		return feasible;
 	}
 
@@ -196,5 +217,5 @@ public class CreateAssignment {
 			System.out.println();
 		}
 	}
-	
+
 }

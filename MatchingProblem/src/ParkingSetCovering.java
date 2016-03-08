@@ -19,6 +19,7 @@ public class ParkingSetCovering{
 	public int[][] XSK;
 	public int[] XK;
 	public int[] YB;
+	public int[] outputID;
 
 	public ParkingSetCovering(boolean fixed, ArrayList<ArrayList<Integer>> allA, int Tracks, int Trains, int[] AssTrack, int[][] AssTrackTrain, int[][] trainInfo) throws IOException, IloException {
 		solveMe(fixed, allA, Tracks, Trains, AssTrack, AssTrackTrain, trainInfo);

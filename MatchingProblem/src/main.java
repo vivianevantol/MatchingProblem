@@ -16,12 +16,24 @@ public class main {
 		initializeEventList eventList = new initializeEventList(); //create the eventlist
 		
 		int MatchingMargin = 0;
-		int maxBlock = 230;
+		int maxBlock = 247;
 		try{ //directly prints output into "CompositionTimesMatching.csv"
 			MatchingProblem matching = new MatchingProblem(maxBlock, MatchingMargin, data);
 		} catch(IloException | IOException e) {
 			System.out.println("Error");
 		} 
+		
+//		ParkingProblem test = new ParkingProblem(500, yard, eventList);
+//		int[][] output = test.returnOutput();
+//		printDoubleArray(output);
+		
+		
+//		ArrayList<Integer> test = new ArrayList<Integer>();
+//		test.add(3);
+//		test.add(1,5);
+//		test.add(1,2);
+//		test.add(1,9);
+//		printList(test);
 		
 //		int[][] test = {{1, 2},{2, 3},{3, 4},{4, 5},{5, 6}};
 //		printDoubleArray(test);

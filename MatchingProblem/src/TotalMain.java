@@ -25,7 +25,7 @@ public class TotalMain {
 //=============================GIVE INPUT===================================================================================
 		int MatchingMargin = 0;
 		int maxBlock = 247;
-		int nriterations = 1;
+		int nriterations = 10;
 
 		for (int i = 0; i < nriterations ; i++){
 			initializeData data = new initializeData(); //create the data set
@@ -99,9 +99,13 @@ public class TotalMain {
 
 //============================EXECUTE PARKING===============================================================================
 
-			ParkingProblem ParkingProblem = new ParkingProblem(blockdata, 500, yard, eventList);
-			int[][] outputParking = ParkingProblem.returnOutput();
-			
+			int zero = 1;
+			int[][] outputParking = new int[nrTrains][2];
+			while(zero>0){
+				ParkingProblem ParkingProblem = new ParkingProblem(blockdata, 500, yard, eventList);
+				outputParking = ParkingProblem.returnOutput();
+				zero = ParkingProblem.getObjective();
+			}
 			
 //=====================DEFINE INPUT FOR HEURISTIC!!!!=======================================================================
 			ArrayList<Integer> priorityPlatform1 = new ArrayList<Integer>();
@@ -113,7 +117,8 @@ public class TotalMain {
 			priorityPlatform2.addAll(M1);
 
 			int[] priorityArrivaltrack = {1, 2, 3, 4}; 
-			int[] priorityArrival =  { 35, 38, 31, 40, 37, 33, 34, 25, 26, 27, 19, 24, 12, 18, 5, 11, 61, 62};
+//			int[] priorityArrival =  { 35, 38, 31, 40, 37, 33, 34, 25, 26, 27, 19, 24, 12, 18, 5, 11, 61, 62};
+			int[] priorityArrival =  { 35, 38, 31, 40, 37, 33, 34,   62, 61};
 			int[] priorityType1 = {48, 50, 49, 52, 53, 54}; // Internal , 49, 53, 50, 54, 51, 55
 			int[] priorityType2 = {56}; // External , 57, 58, 59, 60
 			int[] priorityType3 = {11, 5, 18, 12, 24,19, 30, 25, 34, 31, 11, 18, 24, 30, 10,  17, 23, 29, 9, 16, 22, 28, 8, 15, 21, 27, 7, 14, 20, 26, 6, 13, 19, 25,5, 12}; // depart

@@ -9,6 +9,7 @@ import ilog.concert.IloException;
 
 public class ParkingProblem {
 	private int[][] outputID;
+	private int objective;
 
 	public ParkingProblem(int[][] blockInfo, int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
 		outputID = solveParking(blockInfo, it, yard, eventList);
@@ -153,6 +154,7 @@ public class ParkingProblem {
 		}
 		ParkingSetCoveringMIP ParkingFinal = new ParkingSetCoveringMIP(allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 		int[][] OutputFirst = ParkingFinal.getOutputID();
+		this.objective = ParkingFinal.getObjective();
 
 		//FOR THE LAST 16 TRAINS=======================================================================================================
 		int nTrains2 = 16;
@@ -273,7 +275,11 @@ public class ParkingProblem {
 			}
 		}
 		ParkingSetCoveringMIP ParkingFinal2 = new ParkingSetCoveringMIP(allA2, trackInfo2.length, trainInfo2.length, AssTrack2, AssTrackTrain2, trainInfo2);
-		int[][] OutputSecond =ParkingFinal2.getOutputID();		
+		int[][] OutputSecond =ParkingFinal2.getOutputID();	
+		int secondObjective = ParkingFinal2.getObjective();
+		if(this.objective<secondObjective){
+			this.objective=secondObjective;
+		}
 
 		int[][] totalOutput = new int[OutputFirst.length+OutputSecond.length][2];
 		for(int i=0;i<OutputFirst.length;i++){
@@ -347,5 +353,9 @@ public class ParkingProblem {
 			}
 		}
 		return output;
+	}
+	
+	public int getObjective(){
+		return objective;
 	}
 }

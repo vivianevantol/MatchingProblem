@@ -20,6 +20,7 @@ public class ParkingSetCoveringMIP{
 	public int[] XK;
 	public int[] YB;
 	public int[][] outputID;
+	public int outputObjective;
 
 	public ParkingSetCoveringMIP(ArrayList<ArrayList<Integer>> allA, int Tracks, int Trains, int[] AssTrack, int[][] AssTrackTrain, int[][] trainInfo) throws IOException, IloException {
 		solveMe(allA, Tracks, Trains, AssTrack, AssTrackTrain, trainInfo);
@@ -173,6 +174,7 @@ public class ParkingSetCoveringMIP{
 			System.out.println("Model exported");
 
 				if(cplex.solve()){
+					this.outputObjective = (int) cplex.getValue(objective);
 					this.duals = new double[nTrains+nTracks];
 					for(int i=0;i<constraints.size();i++){
 						duals[i] = cplex.getSlack(constraints.get(i));
@@ -251,5 +253,9 @@ public class ParkingSetCoveringMIP{
 			System.out.print(p.get(i) + " ");
 		}
 		System.out.println("");
+	}
+	
+	public int getObjective(){
+		return outputObjective;
 	}
 }

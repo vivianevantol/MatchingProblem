@@ -46,6 +46,9 @@ public class mainJobShop {
 		for (int i=0; i<comps;i++){
 			int qj = maxD-blockdata[i][4]+blockdata[i][9]+2; //D-departure+wash+2
 			int rj = blockdata[i][3]+2; //arrival+2
+//			if(blockdata[i][7]>0){
+//				rj = rj + blockdata[i][7];
+//			}
 			int p1j = blockdata[i][8]+ blockdata[i][10];//cleaning+repair
 			int p2j = p1j;
 			allJobs.add(new Jobs(i+1,qj,rj,p1j,p2j, blockdata[i][0]));
@@ -75,7 +78,7 @@ public class mainJobShop {
 	
 	//this method gives compID AID DID Atime Dtime Atrack Dtrack Itime Ctime Wtime Rtime
 	public static int[][] initializeBlockInfo(int blocks){
-		int[][] output = new int[blocks+1][11];
+		int[][] output = new int[blocks][11];
 		
 		String csvFile = "CompositionTimes.csv";
 //		String csvFile = "CompositionTimesMatching.csv";

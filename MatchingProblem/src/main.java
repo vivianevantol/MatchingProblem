@@ -15,26 +15,39 @@ public class main {
 		InitializeShuntingYard yard = new InitializeShuntingYard(); //create the shunting yard
 		initializeEventList eventList = new initializeEventList(); //create the eventlist
 		
-		int MatchingMargin = 0;
-		int maxBlock = 247;
-		try{ //directly prints output into "CompositionTimesMatching.csv"
-			MatchingProblem matching = new MatchingProblem(maxBlock, MatchingMargin, data);
-		} catch(IloException | IOException e) {
-			System.out.println("Error");
-		} 
+//		int MatchingMargin = 0;
+//		int maxBlock = 247;
+//		try{ //directly prints output into "CompositionTimesMatching.csv"
+//			MatchingProblem matching = new MatchingProblem(maxBlock, MatchingMargin, data);
+//			System.out.println(matching.getNumberOfTrains());
+//		} catch(IloException | IOException e) {
+//			System.out.println("Error");
+//		} 
+//		int[][] blockInfo = initializeBlockInfo(23);
+//		for(int i=0;i<blockInfo.length;i++){ //arrival + 2 + inspection + 2 + cleaning + repair + (2 + washing) + 2
+//			blockInfo[i][3] = blockInfo[i][3]+ 2 + blockInfo[i][7] + 2 + blockInfo[i][8] + blockInfo[i][10]+ 2;
+//			if(blockInfo[i][9]>0){
+//				blockInfo[i][3] = blockInfo[i][3]  + 2 + blockInfo[i][9];
+//			}
+//		}
+//		printDoubleArray(blockInfo);
 		
-//		ParkingProblem test = new ParkingProblem(500, yard, eventList);
-//		int[][] output = test.returnOutput();
-//		printDoubleArray(output);
+		ParkingProblem test = new ParkingProblem(500, yard, eventList);
+		int[][] output = test.returnOutput();
+		printDoubleArray(output);
 		
 		
+//		int it=0;
+//		while(it<5){
+//			System.out.println("new");
 //		ArrayList<Integer> test = new ArrayList<Integer>();
-//		test.add(3);
-//		test.add(1,5);
-//		test.add(1,2);
-//		test.add(1,9);
+//		test.add(it);
+//		test.add(it+1);
+//		test.add(it+2);
 //		printList(test);
-		
+//		it++;
+//		}
+//		
 //		int[][] test = {{1, 2},{2, 3},{3, 4},{4, 5},{5, 6}};
 //		printDoubleArray(test);
 //		printDoubleArray(Arrays.copyOfRange(test, 2, test.length));

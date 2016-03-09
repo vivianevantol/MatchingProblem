@@ -31,6 +31,8 @@ public class MatchingProblem {
 	public int[] nSameDepartures; //matches with arrival blocks
 	public int[] nSameArrivals; //matches with departure blocks
 
+	private int numberOfTrains;
+	
 	public MatchingProblem(int maxTrack, int margin, initializeData data) throws IOException, IloException {
 		solveMe(maxTrack, margin, data);
 	}
@@ -98,6 +100,7 @@ public class MatchingProblem {
 		this.nArrivalBlock = arrivalblocks.size();//41
 		this.nDepartureBlock = departureblocks.size();//39
 		this.nNodes = 10;
+		this.numberOfTrains =0;
 
 		//		for (int i=0;i<arrivalblocks.size();i++){
 		//			printBlock(arrivalblocks.get(i));
@@ -387,8 +390,7 @@ public class MatchingProblem {
 						}
 					}
 				}
-
-
+				this.numberOfTrains = count;
 
 				//				printDoubleArray(output);
 				System.out.println("Problem Solved.");
@@ -398,6 +400,10 @@ public class MatchingProblem {
 		} catch (IloException e){
 			System.err.println("Concert exception '" + e + "' caught");
 		}
+	}
+	
+	public int getNumberOfTrains(){
+		return numberOfTrains;
 	}
 
 	public trainComposition getComposition(int ID, ArrayList<trainComposition> comps){
@@ -439,6 +445,7 @@ public class MatchingProblem {
 		return check;
 	}
 
+	//with max
 	public static ArrayList<blocks> createblocks(trainComposition c, ArrayList<blocks> b){
 		//with itime is min(max+5, som)
 		//with ctime is min(max+5, som)

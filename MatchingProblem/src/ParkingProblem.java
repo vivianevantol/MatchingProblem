@@ -10,16 +10,15 @@ import ilog.concert.IloException;
 public class ParkingProblem {
 	private int[][] outputID;
 
-	public ParkingProblem(int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
-		outputID = solveParking(it, yard, eventList);
+	public ParkingProblem(int[][] blockInfo, int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
+		outputID = solveParking(blockInfo, it, yard, eventList);
 	}
 
-	public int[][] solveParking(int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
+	public int[][] solveParking(int[][] blockInfo, int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
 		//===========PARKING INITIALIZE DATA===========================================================================================
 		int[][] departures = eventList.getDeparturelist();
 		int nIterations = it;
 
-		int[][] blockInfo = initializeBlockInfo(23);
 		for(int i=0;i<blockInfo.length;i++){ //arrival + 2 + inspection + 2 + cleaning + repair + (2 + washing) + 2
 			blockInfo[i][3] = blockInfo[i][3]+ 2 + blockInfo[i][7] + 2 + blockInfo[i][8] + blockInfo[i][10]+ 2;
 			if(blockInfo[i][9]>0){

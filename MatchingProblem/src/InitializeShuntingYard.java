@@ -260,7 +260,7 @@ public class InitializeShuntingYard {
 
 
  		
-		this.tpm = new int [67][67];
+		this.tpm = new int [67][67]; // vullen met nullen
 		for (int i = 0; i<=66;i++){
 			for (int j=0; j<= 66; j++){
 				tpm[i][j] = 0;
@@ -339,13 +339,16 @@ public class InitializeShuntingYard {
 			}
 		}
 		}
-
+		
+//
 //		for (int i = 0; i<67;i++){
 //			for (int j=0; j< 67; j++){
 //				System.out.print("  "+tpm[i][j]);
 //			}
 //			System.out.println();
 //		}
+		
+	
 
 
 	}

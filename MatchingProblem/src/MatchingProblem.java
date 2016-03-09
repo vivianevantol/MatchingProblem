@@ -205,6 +205,7 @@ public class MatchingProblem {
 		try{
 			//define new model
 			IloCplex cplex = new IloCplex();
+			cplex.setOut(null);
 
 			//decision variables
 			IloIntVar[] arrivalblock = new IloIntVar[nArrivalBlock];
@@ -347,7 +348,7 @@ public class MatchingProblem {
 			}
 
 			cplex.exportModel("MatchingModel.lp");
-			System.out.println("Model exported");
+//			System.out.println("Model exported match");
 
 			if(cplex.solve()){
 
@@ -393,9 +394,11 @@ public class MatchingProblem {
 				this.numberOfTrains = count;
 
 				//				printDoubleArray(output);
-				System.out.println("Problem Solved.");
+//				System.out.println("Problem Solved.");
 				writeExcel(output);
 			}
+			cplex.end();
+			cplex = null;
 
 		} catch (IloException e){
 			System.err.println("Concert exception '" + e + "' caught");

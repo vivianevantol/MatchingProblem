@@ -113,6 +113,7 @@ public class ParkingSetCoveringMIP{
 		try{
 			//define new model
 			IloCplex cplex = new IloCplex();
+			cplex.setOut(null);
 
 			//decision variables
 			IloNumVar[] xk = new IloNumVar[nTotalAssignments];
@@ -171,7 +172,7 @@ public class ParkingSetCoveringMIP{
 			}
 
 			cplex.exportModel("ParkingProblemModel.lp");
-			System.out.println("Model exported");
+//			System.out.println("Model exported");
 
 				if(cplex.solve()){
 					this.outputObjective = (int) cplex.getValue(objective);
@@ -179,8 +180,8 @@ public class ParkingSetCoveringMIP{
 					for(int i=0;i<constraints.size();i++){
 						duals[i] = cplex.getSlack(constraints.get(i));
 					}
-					System.out.println("MIP Problem Solved");
-					System.out.println("Objective: " + cplex.getValue(objective));
+//					System.out.println("MIP Problem Solved");
+//					System.out.println("Objective: " + cplex.getValue(objective));
 
 					for(int b=0;b<nTrains;b++){
 						YB[b] = (int) cplex.getValue(yb[b]);
@@ -196,6 +197,10 @@ public class ParkingSetCoveringMIP{
 						}
 					}
 				}
+				
+				cplex.end();
+				cplex = null;
+//				System.gc();
 
 		} catch (IloException e) {
 			System.out.print("Catch clause" + e);

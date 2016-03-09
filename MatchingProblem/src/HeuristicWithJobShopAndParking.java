@@ -30,7 +30,7 @@
 		public int numberTrains;
 		public ArrayList<Integer> departureArea;
 		public int[][] parkingMatrix;
-
+		public int[] departureReserve;
 
 			
 			public HeuristicWithJobShopAndParking(int[][] parkingMatrix, int numberTrains, int[][] blockdata,initializeData Data, InitializeShuntingYard Yard, initializeEventList eventlist, int[] priorityArrivaltrack, int[]priorityArrivalarea, int[] priorityType1, int[]  priorityType2, int[] priorityType3, int[] priorityType4, int[] priorityType4extra, ArrayList<Integer> priorityPlatform1, ArrayList<Integer> priorityPlatform2){
@@ -53,6 +53,7 @@
 			this.priorityPlatform2 = priorityPlatform2;
 			this.departureArea = departureArea;
 			this.parkingMatrix = parkingMatrix; 
+			this.departureReserve = departureReserve;
 		}
 
 		public double[]  optimization(int[][] tpm) throws FileNotFoundException, IOException{
@@ -149,7 +150,7 @@
 				}	
 			}	
 			
-			
+			int[] departureReserve = {6, 13, 20, 26, 32}; 
 			int counterdep = 0;
 			int counter4 =0;
 
@@ -310,10 +311,10 @@
 				}
 				
 //				print iteration (op deze plek omdat nu alle treinen in het model staan van deze minuut. 			
-				printIteration(positions, minuut);
+//				printIteration(positions, minuut);
 				int[][] aa = List.getArrivallist();
 				results = makeResults(minuut, aa, results, positions);
-				
+
 				// Set movement op false op het moment dat er een move klaar is op deze minuut. 
 				if(end==minuut){
 					movement=false; 
@@ -350,7 +351,16 @@
 								timeMovement = minuut + 2;
 								movement = true;
 								List.setEndmovement(timeMovement);
+								boolean known = false;
+								for (int c = 0; c<100; c++){
+									if (List.getMovementlist()[c][2] == id){	
+										known = true;
+									}
+								}
+								if(!known){
+//									System.out.println("hoi  " + id);
 								setMovementList(id, blockdata, numberTrains);
+								}
 								for (int n = 0; n<50; n++){
 									if (List.getDeparturelist()[n][1] == id){
 										indexcheck = n;
@@ -397,7 +407,16 @@
 								timeMovement = minuut + 2;
 								movement = true;
 								List.setEndmovement(timeMovement);
+								boolean known = false;
+								for (int c = 0; c<100; c++){
+									if (List.getMovementlist()[c][2] == id){	
+										known = true;
+									}
+								}
+								if(!known){
+									System.out.println("hoi  " + id);
 								setMovementList(id, blockdata, numberTrains);
+								}
 								for (int n = 0; n<50; n++){
 									if (List.getDeparturelist()[n][1] == id){
 										indexcheck = n;
@@ -451,49 +470,95 @@
 								int endPosition = -1;
 								
 								int counterindex = 0; 
-								
+								boolean checkParking = false; 
 								if (depArea52.contains(positions.get(intWashposition-1))){
 									for (int p = 11; p > 5; p--){
+										checkParking = true; 
 									departureArea.add(counterindex, p);
 									counterindex = counterindex +1; 
 									}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
+									}
 								}
+								
 								counterindex = 0;
 								if (depArea53.contains(positions.get(intWashposition-1))){
 									for (int p = 18; p > 12; p--){
+										checkParking = true; 
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea54.contains(positions.get(intWashposition-1))){
 									System.out.println(positions.get(intWashposition-1));
 									for (int p = 24; p > 19; p--){
+										checkParking = true; 
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
+								counterindex = 0;
 								if (depArea55.contains(positions.get(intWashposition-1))){
 									for (int p = 30; p > 25; p--){
+										checkParking = true; 
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea56.contains(positions.get(intWashposition-1))){
 									for (int p = 34; p > 31; p--){
+										checkParking = true; 
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea57.contains(positions.get(intWashposition-1))){
+									checkParking = true; 
 									for (int p = 37; p > 35; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
+								
+								if (!checkParking){
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
+									}
+								}
+								checkParking = false; 
+								
 								for (int q=0;q<departureArea.size();q++){
 									movementTime = move.possibleMovement(blockdata, intWashposition, departureArea.get(q), positions, Data, Yard);
 									if(movementTime!=0 && movementTime <100){
@@ -516,6 +581,7 @@
 										break;
 									}
 								}
+								
 							}
 							
 							// als hij nog extern gewassen moet worden gaat hij daar naar toe. 
@@ -612,47 +678,92 @@
 								// als alle activities klaar zijn gaat hij naar de departure area
 								int endPosition = -1;	
 								int counterindex = 0; 
+								boolean checkParking = false; 
 								
 								if (depArea52.contains(positions.get(extWashposition-1))){
+									checkParking = true; 
 									for (int p = 11; p > 5; p--){
 									departureArea.add(counterindex, p);
 									counterindex = counterindex +1; 
 									}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
+									}
 								}
+								
 								counterindex = 0;
 								if (depArea53.contains(positions.get(extWashposition-1))){
+									checkParking = true;
 									for (int p = 18; p > 12; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea54.contains(positions.get(extWashposition-1))){
+									checkParking = true;
 									for (int p = 24; p > 19; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea55.contains(positions.get(extWashposition-1))){
+									checkParking = true;
 									for (int p = 30; p > 25; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea56.contains(positions.get(extWashposition-1))){
+									checkParking = true;
 									for (int p = 34; p > 31; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
+								counterindex = 0;
 								if (depArea57.contains(positions.get(extWashposition-1))){
+									checkParking = true;
 									for (int p = 37; p > 35; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
+								if(!checkParking){
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
+									}
+								}
+								
 								counterindex = 0;
 								for (int q=0;q<departureArea.size();q++){
 									movementTime = move.possibleMovement(blockdata, extWashposition, departureArea.get(q), positions, Data, Yard);
@@ -714,8 +825,6 @@
 						for (int uu = 0; uu<numberTrains; uu++){
 							if (List.getActivitylist()[uu][1] == priorityPlatform1.get(j)){// check activity
 								locatie = uu; 
-//								System.out.println(priorityPlatform1.get(j));
-//								System.out.println(List.getActivitylist()[locatie][0]);
 							}
 						}
 						if (List.getActivitylist()[locatie][0] > 10000){
@@ -928,48 +1037,92 @@
 							else if(movementType ==3){ //move to depart area
 								
 								int counterindex = 0; 
-								
+								boolean checkParking = false;
 								if (depArea52.contains(positions.get(currentPosition))){
+									checkParking = true;
 									for (int p = 11; p > 5; p--){
 									departureArea.add(counterindex, p);
 									counterindex = counterindex +1; 
 									}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
+									}
 								}
+								
 								counterindex = 0;
 								if (depArea53.contains(positions.get(currentPosition))){
+									checkParking = true;
 									for (int p = 18; p > 12; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea54.contains(positions.get(currentPosition))){
+									checkParking = true;
 									for (int p = 24; p > 19; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea55.contains(positions.get(currentPosition))){
+									checkParking = true;
 									for (int p = 30; p > 25; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea56.contains(positions.get(currentPosition))){
+									checkParking = true;
 									for (int p = 34; p > 31; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
 								counterindex = 0;
 								if (depArea57.contains(positions.get(currentPosition))){
+									checkParking = true;
 									for (int p = 37; p > 35; p--){
 										departureArea.add(counterindex, p);
 										counterindex = counterindex +1; 
 										}
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
 									}
+								}
+								
+								if(!checkParking){
+									for (int v = 0; v< 5; v++){
+										departureArea.add(counterindex, departureReserve[v]); 
+										counterindex = counterindex+1;
+									}
+								}
+								
+								
 								counterindex = 0;
 								for (int q=0;q<departureArea.size();q++){
 									
@@ -1106,6 +1259,7 @@
 			printpositionTrainMatrix(matrix, numberTrains);
 			System.out.println();
 			printtijdTrainMatrix(movementtijdmatrix, numberTrains);
+			printDoubleArray(results);
 			
 			// print performance
 			double result1 = printPerformance(List.activitylist);
@@ -1420,6 +1574,7 @@
 			} else {
 				type1Event = type3Event - washIntern - repair - movementtime;
 			}
+			
 			List.setMovementlist((int) type1Event, id, 1, location);
 
 			// -------------------------------------------------------------------------------------------------- 
@@ -1654,6 +1809,14 @@
 		//					if {depa
 		//				}
 
+		public static void printDoubleArray(int[][] printer){
+			for (int i=0;i<printer.length;i++){
+				for(int j=0;j<printer[0].length;j++){
+					System.out.print(printer[i][j] + "  " );
+				}
+				System.out.println();
+			}
+		}
 	}
 
 

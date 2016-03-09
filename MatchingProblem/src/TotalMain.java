@@ -25,22 +25,33 @@ public class TotalMain {
 //=============================GIVE INPUT===================================================================================
 		int MatchingMargin = 0;
 		int maxBlock = 247;
-		int nriterations = 10;
+		int nriterations = 50;
 
 		for (int i = 0; i < nriterations ; i++){
-			initializeData data = new initializeData(); //create the data set
+			System.out.println("Iteration: " + (i+1));
+			long timeItStart = System.currentTimeMillis();
+			long timeMatchStart = System.currentTimeMillis();
+			initializeData data = new initializeData();
 			
 			
 //==============================EXECUTE MATCHING============================================================================
 			int nrTrains = 0;
 			while(nrTrains==0){
+				System.out.println("try match");
 				try{ //directly prints output into "CompositionTimesMatching.csv"
+					data = null;
+					data = new initializeData(); //create the data set
 					MatchingProblem matching = new MatchingProblem(maxBlock, MatchingMargin, data);
 					nrTrains = matching.getNumberOfTrains();
+					matching = null;
 				} catch(IloException | IOException e) {
 					System.out.println("Error");
 				} //Check what file is used in initializeEventList??!!
 			}
+			long timeMatchEnd = System.currentTimeMillis();
+			System.out.println("Matching Executed in " + (timeMatchEnd-timeMatchStart));
+			long timeJobStart = System.currentTimeMillis();
+			
 			InitializeShuntingYard yard = new InitializeShuntingYard(); //create the shunting yard
 			initializeEventList eventList = new initializeEventList(); //create the eventlist
 			int[][] blockdata = initializeBlockInfo(nrTrains);
@@ -52,7 +63,8 @@ public class TotalMain {
 				trainInfo[x][0] = departures[x][1];
 				trainInfo[x][1] = arrivals[x][0];
 				trainInfo[x][2] = departures[x][0];
-				trainInfo[x][3] = (int) getLength(departures[x][1], data);
+//				trainInfo[x][3] = (int) getLength(departures[x][1], data);
+				trainInfo[x][3] = blockdata[x][11];
 			}
 			ArrayList<Track> tracks = yard.getTracks();
 			int[][] trackInfo = new int[tracks.size()][3]; //lengt left right
@@ -66,7 +78,7 @@ public class TotalMain {
 			ArrayList<Jobs> allJobs = new ArrayList<Jobs>();
 			ArrayList<Jobs> oneJobs = new ArrayList<Jobs>();
 			ArrayList<Jobs> twoJobs = new ArrayList<Jobs>();
-			ArrayList<Train> trains = data.getTrains();
+//			ArrayList<Train> trains = data.getTrains();
 
 			int maxD = 0;
 			for(int j=0;j<departures.length;j++){
@@ -96,16 +108,32 @@ public class TotalMain {
 					M2.add(output[j][3]);
 				}
 			}
-
+			long timeJobEnd = System.currentTimeMillis();
+			System.out.println("Job Shop Executed in " + (timeJobEnd-timeJobStart));
+			long timeParkingStart  = System.currentTimeMillis();
 //============================EXECUTE PARKING===============================================================================
-
+			int firstblock = 0;
+			int bl=0;
+			while(bl<blockdata.length){
+				if(blockdata[bl][3]>500){
+					firstblock = bl;
+					bl=100;
+				}
+				bl++;
+			}
+			int secondblock = nrTrains-firstblock;
+			
 			int zero = 1;
 			int[][] outputParking = new int[nrTrains][2];
-			while(zero>0){
-				ParkingProblem ParkingProblem = new ParkingProblem(blockdata, 500, yard, eventList);
-				outputParking = ParkingProblem.returnOutput();
-				zero = ParkingProblem.getObjective();
-			}
+//			System.out.println("test: " + firstblock + "  " + secondblock);
+
+			ParkingProblem ParkingProblem = new ParkingProblem(firstblock, secondblock, blockdata, 500, yard, eventList);
+			outputParking = ParkingProblem.returnOutput();
+			zero = ParkingProblem.getObjective();
+
+			long timeParkingEnd  = System.currentTimeMillis();
+			System.out.println("Parking Executed in " + (timeParkingEnd-timeParkingStart));
+			long timeHeurStart = System.currentTimeMillis();
 			
 //=====================DEFINE INPUT FOR HEURISTIC!!!!=======================================================================
 			ArrayList<Integer> priorityPlatform1 = new ArrayList<Integer>();
@@ -151,8 +179,13 @@ public class TotalMain {
 //			HeuristicWithJobShopAndParking model = new HeuristicWithJobShopAndParking(outputParking, nrTrains, blockdata, data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra, priorityPlatform1, priorityPlatform2); //create the model
 			HeuristicWithJobShop model = new HeuristicWithJobShop(nrTrains, blockdata, data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra, priorityPlatform1, priorityPlatform2); //create the model
 
+			
+			
 			results = model.optimization(test); //run the model and obtain output
 			int run = i+1;
+			long timeHeurEnd = System.currentTimeMillis();
+			System.out.println("Heuristic Executed in " + (timeHeurEnd-timeHeurStart));
+			
 			
 			System.out.println("Run " + run);
 			System.out.println("Right track departures:  " + results[1]);
@@ -168,6 +201,20 @@ public class TotalMain {
 			if(results[0] > 0.999 && results[1] > 22.5){
 				countervolledigfeasiblehelemaal = countervolledigfeasiblehelemaal +1;
 			}
+			
+			long timeItEnd = System.currentTimeMillis();
+			System.out.println("Iteration finished in " + (timeItEnd-timeItStart));
+			
+			data = null;
+			yard = null;
+			eventList = null;
+			
+//			matching is emptied in the try
+			jobshop = null;
+			ParkingProblem = null;
+			model = null;
+			
+			System.gc();
 		}
 
 		long timeAfter = System.currentTimeMillis();

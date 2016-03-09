@@ -28,11 +28,10 @@ public class HeuristicWithJobShop {
 
 
 		
-		public HeuristicWithJobShop(int numberTrains, int[][] blockdata,initializeData Data, InitializeShuntingYard Yard, initializeEventList eventlist, int[] priorityArrivaltrack, int[]priorityArrivalarea, int[] priorityType1, int[]  priorityType2, int[] priorityType3, int[] priorityType4, int[] priorityType4extra, ArrayList<Integer> priorityPlatform1, ArrayList<Integer> priorityPlatform2){
+		public HeuristicWithJobShop(int numberTrains, int[][] blockdata, initializeData data, InitializeShuntingYard Yard, initializeEventList eventlist, int[] priorityArrivaltrack, int[]priorityArrivalarea, int[] priorityType1, int[]  priorityType2, int[] priorityType3, int[] priorityType4, int[] priorityType4extra, ArrayList<Integer> priorityPlatform1, ArrayList<Integer> priorityPlatform2){
 
 
-
-		this.Data = Data;
+		this.Data = data;
 		this.numberTrains = numberTrains; 
 		this.Yard = Yard;
 		this.List = eventlist;
@@ -62,7 +61,7 @@ public class HeuristicWithJobShop {
 		movement = false;
 		int[][] matrix = new int[30][150]; 
 		int[][] results = new int[24][1402];
-		int[][] movementtijdmatrix = new int[30][15];
+		int[][] movementtijdmatrix = new int[30][30];
 		int[][] r = List.getArrivallist();
 		for (int i = 0; i<30; i++){
 			matrix[i][0] = r[i][1]; //keep track of all positions of each train
@@ -243,7 +242,7 @@ public class HeuristicWithJobShop {
 			}
 			
 //			print iteration (op deze plek omdat nu alle treinen in het model staan van deze minuut. 			
-			printIteration(positions, minuut);
+//			printIteration(positions, minuut);
 			int[][] aa = List.getArrivallist();
 			results = makeResults(minuut, aa, results, positions);
 			
@@ -295,7 +294,16 @@ public class HeuristicWithJobShop {
 							timeMovement = minuut + 2;
 							movement = true;
 							List.setEndmovement(timeMovement);
+							boolean known = false;
+							for (int c = 0; c<100; c++){
+								if (List.getMovementlist()[c][2] == id){	
+									known = true;
+								}
+							}
+							if(!known){
+//								System.out.println("hoi  " + id);
 							setMovementList(id, blockdata, numberTrains);
+							}
 							for (int n = 0; n<50; n++){
 								if (List.getDeparturelist()[n][1] == id){
 									indexcheck = n;
@@ -324,10 +332,11 @@ public class HeuristicWithJobShop {
 				if (positiearrival != -1){
 					int endPosition = -1;	
 					for (int i=0;i<priorityArrivalarea.length;i++){
+
 						movementTime = move.possibleMovement(blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
 						if(movementTime!=0 && movementTime<100){
 							endPosition = priorityArrivalarea[i];
-							int id;
+							int id = positions.get(positiearrival);
 							if(positiearrival==0){
 								id = positions.get(positiearrival+1);
 							} else {
@@ -342,7 +351,16 @@ public class HeuristicWithJobShop {
 							timeMovement = minuut + 2;
 							movement = true;
 							List.setEndmovement(timeMovement);
+							boolean known = false;
+							for (int c = 0; c<100; c++){
+								if (List.getMovementlist()[c][2] == id){	
+									known = true;
+								}
+							}
+							if(!known){
+//								System.out.println("hoi  " + id);
 							setMovementList(id, blockdata, numberTrains);
+							}
 							for (int n = 0; n<50; n++){
 								if (List.getDeparturelist()[n][1] == id){
 									indexcheck = n;
@@ -905,17 +923,17 @@ public class HeuristicWithJobShop {
 
 	
 		// Print activitylist
-		for (int i=0; i<numberTrains;i++){
-			for(int j=0; j<8;j++){
-					System.out.print("  "+List.getActivitylist()[i][j]);
-				}System.out.println();
-			}
+//		for (int i=0; i<numberTrains;i++){
+//			for(int j=0; j<8;j++){
+//					System.out.print("  "+List.getActivitylist()[i][j]);
+//				}System.out.println();
+//			}
 		
 		// print end position matrix
-		System.out.println();
-		printpositionTrainMatrix(matrix, numberTrains);
-		System.out.println();
-		printtijdTrainMatrix(movementtijdmatrix, numberTrains);
+//		System.out.println();
+//		printpositionTrainMatrix(matrix, numberTrains);
+//		System.out.println();
+//		printtijdTrainMatrix(movementtijdmatrix, numberTrains);
 		
 		// print performance
 		double result1 = printPerformance(List.activitylist);
@@ -1253,7 +1271,9 @@ public class HeuristicWithJobShop {
 			}
 		}
 
-//		System.out.println("dit22  " + type + "  " + id + "   " + inspection);
+//		if (id == 83003){
+//		System.out.println("dit22  " + type + "  " + id + "   " + washExtern);
+//		}
 		if(type ==1){ //internal
 			if(List.getActivitylist()[location][4]==1){ //needs cleaning
 				List.setActivitylist(location, 1, arrival+washIntern+repair);
@@ -1377,14 +1397,16 @@ public class HeuristicWithJobShop {
 				break;
 			}
 		}
-		for (int j = 0; j<15 ; j++){
+		for (int j = 0; j<30 ; j++){
 
 			if (matrix[indexrij][j] == 0){
 				indexkolom = j;	
 				break;
 			}
 		}
+		if(indexkolom != -1){
 		matrix[indexrij][indexkolom] = (minuut+2);	
+		}
 		return matrix;
 	}
 

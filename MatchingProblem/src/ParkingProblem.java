@@ -11,11 +11,11 @@ public class ParkingProblem {
 	private int[][] outputID;
 	private int objective;
 
-	public ParkingProblem(int[][] blockInfo, int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
-		outputID = solveParking(blockInfo, it, yard, eventList);
+	public ParkingProblem(int first, int second, int[][] blockInfo, int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
+		outputID = solveParking(first, second, blockInfo, it, yard, eventList);
 	}
 
-	public int[][] solveParking(int[][] blockInfo, int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
+	public int[][] solveParking(int first, int second, int[][] blockInfo, int it, InitializeShuntingYard yard, initializeEventList eventList) throws IOException, IloException{
 		//===========PARKING INITIALIZE DATA===========================================================================================
 		int[][] departures = eventList.getDeparturelist();
 		int nIterations = it;
@@ -33,7 +33,7 @@ public class ParkingProblem {
 
 		//=====FOR THE FIRST 7 TRAINS==================================================================================================
 
-		int nTrains = 7;
+		int nTrains = first;
 		
 
 		
@@ -71,7 +71,7 @@ public class ParkingProblem {
 		int[] AssTrack = new int[trackInfo.length];
 		int[][] AssTrackTrain = new int[trackInfo.length][trainInfo.length];
 
-		System.out.println("Initialization parking model===========================================================");
+//		System.out.println("Initialization parking model===========================================================");
 		ParkingSetCoveringRelaxed ParkingInitialize = new ParkingSetCoveringRelaxed(allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 		ParkingSetCoveringMIP ParkingMIPinitialize = new ParkingSetCoveringMIP(allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 		double[] output = ParkingInitialize.getDuals();
@@ -95,8 +95,8 @@ public class ParkingProblem {
 		boolean allPos = false; //Checks wheter all duals are positive
 		int iterations = 1;
 		while(allPos==false){
-			System.out.println("=========================================================================================");
-			System.out.println("Iteration " + iterations);
+//			System.out.println("=========================================================================================");
+//			System.out.println("Iteration " + iterations);
 			//==============PARKING CREATE ASSIGNMENT======================================================================================
 			int trys=0;
 			int tryb=0;
@@ -151,13 +151,18 @@ public class ParkingProblem {
 			if(iterations>=nIterations){
 				allPos = true;
 			}
+			
+			ParkingInitialize = null;
+			ParkingMIPinitialize = null;
+			Parking = null;
+			ParkingMIP = null;
 		}
 		ParkingSetCoveringMIP ParkingFinal = new ParkingSetCoveringMIP(allA, trackInfo.length, trainInfo.length, AssTrack, AssTrackTrain, trainInfo);
 		int[][] OutputFirst = ParkingFinal.getOutputID();
 		this.objective = ParkingFinal.getObjective();
 
 		//FOR THE LAST 16 TRAINS=======================================================================================================
-		int nTrains2 = 16;
+		int nTrains2 = second;
 
 
 		int[][] trackInfo2 = new int[nTracks2][3]; //lengt left right
@@ -193,7 +198,7 @@ public class ParkingProblem {
 		int[] AssTrack2 = new int[trackInfo2.length];
 		int[][] AssTrackTrain2 = new int[trackInfo2.length][trainInfo2.length];
 		//==============PARKING INITIALIZE SET COVERING PROBLEM========================================================================
-		System.out.println("Initialization parking model===========================================================");
+//		System.out.println("Initialization parking model===========================================================");
 		ParkingSetCoveringRelaxed ParkingInitialize2 = new ParkingSetCoveringRelaxed(allA2, trackInfo2.length, trainInfo2.length, AssTrack2, AssTrackTrain2, trainInfo2);
 		ParkingSetCoveringMIP ParkingMIPinitialize2 = new ParkingSetCoveringMIP(allA2, trackInfo2.length, trainInfo2.length, AssTrack2, AssTrackTrain2, trainInfo2);
 		double[] output2 = ParkingInitialize2.getDuals();
@@ -217,8 +222,8 @@ public class ParkingProblem {
 		boolean allPos2 = false; //Checks wheter all duals are positive
 		int iterations2 = 1;
 		while(allPos2==false){
-			System.out.println("=========================================================================================");
-			System.out.println("Iteration " + iterations2);
+//			System.out.println("=========================================================================================");
+//			System.out.println("Iteration " + iterations2);
 			//==============PARKING CREATE ASSIGNMENT======================================================================================
 			int trys2=0;
 			int tryb2=0;
@@ -273,13 +278,23 @@ public class ParkingProblem {
 			if(iterations2>=nIterations){
 				allPos2 = true;
 			}
+			
+			ParkingInitialize2 = null;
+			ParkingMIPinitialize2 = null;
+			Parking2 = null;
+			ParkingMIP2 = null;
 		}
 		ParkingSetCoveringMIP ParkingFinal2 = new ParkingSetCoveringMIP(allA2, trackInfo2.length, trainInfo2.length, AssTrack2, AssTrackTrain2, trainInfo2);
+		
 		int[][] OutputSecond =ParkingFinal2.getOutputID();	
 		int secondObjective = ParkingFinal2.getObjective();
 		if(this.objective<secondObjective){
 			this.objective=secondObjective;
 		}
+		
+		ParkingFinal = null;
+		ParkingFinal2 = null;
+//		System.gc();
 
 		int[][] totalOutput = new int[OutputFirst.length+OutputSecond.length][2];
 		for(int i=0;i<OutputFirst.length;i++){

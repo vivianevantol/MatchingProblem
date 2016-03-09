@@ -125,6 +125,7 @@ public class ParkingSetCoveringRelaxed{
 		try{
 			//define new model
 			IloCplex cplex = new IloCplex();
+			cplex.setOut(null);
 
 			//decision variables
 
@@ -196,15 +197,15 @@ public class ParkingSetCoveringRelaxed{
 			}
 
 			cplex.exportModel("ParkingProblemModelRelaxed.lp");
-			System.out.println("Relaxed Model exported");
+//			System.out.println("Relaxed Model exported");
 
 				if(cplex.solve()){
 					this.duals = new double[nTrains+nTracks];
 					for(int i=0;i<constraints.size();i++){
 						duals[i] = cplex.getDual(constraints.get(i));
 					}
-					System.out.println("Fixed Problem Solved: Duals returned");
-					System.out.println("Objective: " + cplex.getValue(objective));
+//					System.out.println("Fixed Problem Solved: Duals returned");
+//					System.out.println("Objective: " + cplex.getValue(objective));
 					
 					for(int b=0;b<nTrains;b++){
 						YB[b] = cplex.getValue(yb[b]);
@@ -220,6 +221,10 @@ public class ParkingSetCoveringRelaxed{
 //					printArray(XK);
 				}
 
+				cplex.end();
+				cplex = null;
+//				System.gc();
+				
 		} catch (IloException e) {
 			System.out.print("Catch clause" + e);
 		}

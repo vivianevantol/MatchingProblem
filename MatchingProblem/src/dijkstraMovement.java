@@ -26,7 +26,7 @@ public class dijkstraMovement {
 		adjacencyMatrix = new int[number_of_nodes + 1][number_of_nodes + 1];
 	}
 
-	public int possibleMovement(int[][] blockdata, int start, int end, ArrayList<Integer> positions, initializeData Data, InitializeShuntingYard Yard) throws FileNotFoundException, IOException{
+	public int possibleMovement(int nrTrains, int[][] blockdata, int start, int end, ArrayList<Integer> positions, initializeData Data, InitializeShuntingYard Yard) throws FileNotFoundException, IOException{
 		int adjacency_matrix[][];
 		int number_of_vertices;
 		int source = 0, destination = 0;
@@ -177,7 +177,7 @@ public class dijkstraMovement {
 
 
 		int idnew; 
-		double movingTrainLength = getLength(id, blockdata);
+		double movingTrainLength = getLength(nrTrains, id, blockdata);
 		int track = -1;
 		for (int i = 0; i<14; i++){
 			for (int j = 0; j<10; j++){
@@ -191,7 +191,7 @@ public class dijkstraMovement {
 		for (int i =0 ; i<10; i++){
 			if(positionsPerTrack[track][i]!=0){ // dont look at start position
 				idnew = positions.get(positionsPerTrack[track][i]-1);
-				currentTrainLength = currentTrainLength + getLength(idnew, blockdata); 
+				currentTrainLength = currentTrainLength + getLength(nrTrains, idnew, blockdata); 
 			}
 		}
 
@@ -211,8 +211,8 @@ public class dijkstraMovement {
 		return possibleMovement;
 	}
 
-	public void lengtetrein (int id, int[][] blockdata){
-		double movingTrainLength = getLength(id, blockdata);
+	public void lengtetrein (int nrTrains, int id, int[][] blockdata){
+		double movingTrainLength = getLength(nrTrains, id, blockdata);
 		System.out.println("id van de trein" + id +"   lengte van de trein:  "+movingTrainLength);
 				}
 	
@@ -311,10 +311,10 @@ public class dijkstraMovement {
 //		return length;
 //	}
 	
-	public double getLength(int id, int[][] Blockdata){
+	public double getLength(int nrTrains, int id, int[][] Blockdata){
 		int column = -1;
 		int length = 0;
-		for (int i = 0; i<23; i++){
+		for (int i = 0; i<nrTrains; i++){
 			if (Blockdata[i][0] == id){
 				column = i;
 			}

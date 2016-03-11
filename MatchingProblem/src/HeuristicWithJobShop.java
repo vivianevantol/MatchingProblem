@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class HeuristicWithJobShop {
 		this.priorityPlatform2 = priorityPlatform2;
 	}
 
-	public double[]  optimization(int[][] tpm) throws FileNotFoundException, IOException{
+	public double[]  optimization(int nrTrains, int[][] tpm, int iteration) throws FileNotFoundException, IOException{
 		//This should all be implemented in the data set, and the shunting yard
 		ArrayList<Integer> positions = new ArrayList<Integer>(); // Alle posities leeg
 		dijkstraMovement move = new dijkstraMovement();
@@ -285,7 +286,7 @@ public class HeuristicWithJobShop {
 				if (positiearrival != -1){
 					int endPosition = -1;	
 					for (int i=0;i<priorityArrivalarea.length;i++){
-						movementTime = move.possibleMovement(blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
+						movementTime = move.possibleMovement(nrTrains, blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
 						if(movementTime!=0 && movementTime<100){							
 							endPosition = priorityArrivalarea[i];
 							int id = positions.get(positiearrival);
@@ -333,7 +334,7 @@ public class HeuristicWithJobShop {
 					int endPosition = -1;	
 					for (int i=0;i<priorityArrivalarea.length;i++){
 
-						movementTime = move.possibleMovement(blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
+						movementTime = move.possibleMovement(nrTrains, blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
 						if(movementTime!=0 && movementTime<100){
 							endPosition = priorityArrivalarea[i];
 							int id = positions.get(positiearrival);
@@ -413,7 +414,7 @@ public class HeuristicWithJobShop {
 						if (List.getActivitylist()[location][3] == 0 && List.getActivitylist()[location][4] == 0 && List.getActivitylist()[location][5] == 0 && List.getActivitylist()[location][6] == 0){
 							int endPosition = -1;
 							for (int q=0;q<priorityType3.length;q++){
-								movementTime = move.possibleMovement(blockdata, intWashposition, priorityType3[q], positions, Data, Yard);
+								movementTime = move.possibleMovement(nrTrains, blockdata, intWashposition, priorityType3[q], positions, Data, Yard);
 								if(movementTime!=0 && movementTime <100){
 									endPosition = priorityType3[q];
 									int id = positions.get(intWashposition-1);
@@ -440,7 +441,7 @@ public class HeuristicWithJobShop {
 						else if (List.getActivitylist()[location][3] != 0){
 							int endPosition = -1;
 							for (int q=0;q<priorityType2.length;q++){
-								movementTime = move.possibleMovement(blockdata, intWashposition, priorityType2[q], positions, Data, Yard);
+								movementTime = move.possibleMovement(nrTrains, blockdata, intWashposition, priorityType2[q], positions, Data, Yard);
 								if(movementTime!=0 && movementTime <100){
 									endPosition = priorityType2[q];
 									int id = positions.get(intWashposition-1);
@@ -476,7 +477,7 @@ public class HeuristicWithJobShop {
 							// Als hij nog iets anders moet doen (kan eigenlijk niet, maar to be sure), gaat hij terug naar de arrival area
 							int endPosition = -1;
 							for (int q=0;q<priorityArrivalarea.length;q++){
-								movementTime = move.possibleMovement(blockdata, intWashposition, priorityArrivalarea[q], positions, Data, Yard);
+								movementTime = move.possibleMovement(nrTrains, blockdata, intWashposition, priorityArrivalarea[q], positions, Data, Yard);
 								if(movementTime!=0 && movementTime <100){
 									endPosition = priorityArrivalarea[q];
 									int id = positions.get(intWashposition-1);
@@ -529,7 +530,7 @@ public class HeuristicWithJobShop {
 							// als alle activities klaar zijn gaat hij naar de departure area
 							int endPosition = -1;
 							for (int q=0;q<priorityType3.length;q++){
-								movementTime = move.possibleMovement(blockdata, extWashposition, priorityType3[q], positions, Data, Yard);						
+								movementTime = move.possibleMovement(nrTrains, blockdata, extWashposition, priorityType3[q], positions, Data, Yard);						
 								if(movementTime!=0 && movementTime <100){
 									endPosition = priorityType3[q];
 									int id = positions.get(extWashposition-1);
@@ -555,7 +556,7 @@ public class HeuristicWithJobShop {
 							//Zoniet dan gaat hij naar de arrival area (niet terug naar internal cleaning omdat die te druk bezet is). 
 							int endPosition = -1;
 							for (int q=0;q<priorityArrivalarea.length;q++){
-								movementTime = move.possibleMovement(blockdata, extWashposition, priorityArrivalarea[q], positions, Data, Yard);						
+								movementTime = move.possibleMovement(nrTrains, blockdata, extWashposition, priorityArrivalarea[q], positions, Data, Yard);						
 								if(movementTime!=0 && movementTime <100){
 									endPosition = priorityArrivalarea[q];
 									int id = positions.get(extWashposition-1);
@@ -598,7 +599,7 @@ public class HeuristicWithJobShop {
 						if(plat1fill==false){
 							int currentPosition = getIndex(positions, priorityPlatform1.get(j));
 							if (currentPosition != -1){ // als hij nog niet in het model is
-							movementTime = move.possibleMovement(blockdata, currentPosition+1, platform1[p], positions, Data, Yard);
+							movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, platform1[p], positions, Data, Yard);
 							if(movementTime!=0 && movementTime<100){
 								plat1fill = true;
 								int endPosition = platform1[p];
@@ -660,7 +661,7 @@ public class HeuristicWithJobShop {
 						if(plat2fill==false){
 							int currentPosition = getIndex(positions, priorityPlatform2.get(j));
 							if (currentPosition != -1){
-							movementTime = move.possibleMovement(blockdata, currentPosition+1, platform2[p], positions, Data, Yard);
+							movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, platform2[p], positions, Data, Yard);
 							if(movementTime!=0 && movementTime<100){
 								plat2fill = true;			
 								int endPosition = platform2[p];
@@ -770,7 +771,7 @@ public class HeuristicWithJobShop {
 						else if(movementType ==2){ // external cleaning
 						
 							for (int i=0;i<priorityType2.length;i++){
-								movementTime = move.possibleMovement(blockdata, currentPosition+1, priorityType2[i], positions, Data, Yard);
+								movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, priorityType2[i], positions, Data, Yard);
 								if(movementTime!=0 && movementTime<100){
 									moveexecuted = true;
 									endPosition = priorityType2[i];
@@ -806,7 +807,7 @@ public class HeuristicWithJobShop {
 									List.setMovementlist(Integer.MAX_VALUE, movementTrainID, movementType , movementMin[0]);
 								}
 								if (alreadyDeparture = false){
-									movementTime = move.possibleMovement(blockdata, currentPosition+1, priorityType3[i], positions, Data, Yard);
+									movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, priorityType3[i], positions, Data, Yard);
 									if(movementTime!=0 && movementTime<100){
 										moveexecuted = true;
 										endPosition = priorityType3[i];
@@ -839,7 +840,7 @@ public class HeuristicWithJobShop {
 //								if (movementTrainID == 80428 || movementTrainID == 80206 || movementTrainID == 83071){
 									for (int i=0;i<priorityType4extra.length;i++){
 										if (priorityType4[i] != 1 && priorityType4[i] != 2){
-										movementTime = move.possibleMovement(blockdata, currentPosition+1, priorityType4extra[i], positions, Data, Yard);
+										movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, priorityType4extra[i], positions, Data, Yard);
 										if(movementTime!=0 && movementTime<100){
 											moveexecuted = true;
 											endPosition = priorityType4extra[i];
@@ -875,7 +876,7 @@ public class HeuristicWithJobShop {
 								else {
 									for (int i=0;i<priorityType4.length;i++){
 										if (priorityType4[i] != 1 && priorityType4[i] != 2){
-										movementTime = move.possibleMovement(blockdata, currentPosition+1, priorityType4[i], positions, Data, Yard);
+										movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, priorityType4[i], positions, Data, Yard);
 										if(movementTime!=0 && movementTime<100){
 											moveexecuted = true; 
 											endPosition = priorityType4[i];
@@ -934,6 +935,9 @@ public class HeuristicWithJobShop {
 //		printpositionTrainMatrix(matrix, numberTrains);
 //		System.out.println();
 //		printtijdTrainMatrix(movementtijdmatrix, numberTrains);
+		String R = "Results";
+		String filename = R.concat(Integer.toString(iteration)).concat(".csv");
+		writeExcel(results, filename);
 		
 		// print performance
 		double result1 = printPerformance(List.activitylist);
@@ -1442,6 +1446,39 @@ public class HeuristicWithJobShop {
 				System.out.print(positionTrainMatrix[i][j] + "     ");
 			}
 			System.out.println("");
+		}
+	}
+	
+	public void writeExcel(int[][] matrix, String filename){
+
+		FileWriter fileWriter = null;
+		String FILE_HEADER = filename;
+		String COMMA_DELIMITER = ";"; //maybe this must be comma
+		String NEW_LINE_SEPARATOR = "\r\n";
+
+
+		try{
+//			String name = "CompositionTimesMatching.csv";
+			String name = filename;
+			fileWriter = new FileWriter(name);
+			fileWriter.append(FILE_HEADER.toString());
+			fileWriter.append(NEW_LINE_SEPARATOR);
+			for(int i=0;i<matrix.length;i++){ //each line
+
+				for(int j=0;j<matrix[0].length;j++){ //each cel
+					fileWriter.append(Integer.toString(matrix[i][j]));
+					fileWriter.append(COMMA_DELIMITER);
+				}
+				fileWriter.append(NEW_LINE_SEPARATOR);
+			}
+		} catch (Exception e) {
+		} finally {
+			try {
+				fileWriter.flush();
+				fileWriter.close();
+			} catch (IOException e) {
+
+			}
 		}
 	}
 

@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 import ilog.concert.IloException;
 
 //import ilog.concert.IloException;
@@ -7,6 +5,7 @@ import ilog.concert.IloException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -23,9 +22,9 @@ public class TotalMain {
 		double avgactivity = 0;
 
 //=============================GIVE INPUT===================================================================================
-		int MatchingMargin = 0;
+		int MatchingMargin = 20;
 		int maxBlock = 247;
-		int nriterations = 50;
+		int nriterations = 100;
 
 		for (int i = 0; i < nriterations ; i++){
 			System.out.println("Iteration: " + (i+1));
@@ -58,7 +57,7 @@ public class TotalMain {
 			
 			int[][] departures = eventList.getDeparturelist();
 			int[][] arrivals = eventList.getArrivallist();
-			int[][] trainInfo = new int[departures.length][4]; //ID Atime Dtime Length
+			int[][] trainInfo = new int[nrTrains][4]; //ID Atime Dtime Length
 			for (int x=0;x<trainInfo.length;x++){
 				trainInfo[x][0] = departures[x][1];
 				trainInfo[x][1] = arrivals[x][0];
@@ -66,6 +65,9 @@ public class TotalMain {
 //				trainInfo[x][3] = (int) getLength(departures[x][1], data);
 				trainInfo[x][3] = blockdata[x][11];
 			}
+			String trainInf = "trainInfo";
+			String infoname = trainInf.concat(Integer.toString(i+1));
+			writeExcel(trainInfo, infoname.concat(".csv"));
 			ArrayList<Track> tracks = yard.getTracks();
 			int[][] trackInfo = new int[tracks.size()][3]; //lengt left right
 			for(int s=0;s<tracks.size();s++){
@@ -73,6 +75,7 @@ public class TotalMain {
 				trackInfo[s][1] = 0;
 				trackInfo[s][2] = 0;
 			}
+//			printDoubleArray(trackInfo);
 			
 //============================EXECUTE JOBSHOP===============================================================================
 			ArrayList<Jobs> allJobs = new ArrayList<Jobs>();
@@ -127,9 +130,9 @@ public class TotalMain {
 			int[][] outputParking = new int[nrTrains][2];
 //			System.out.println("test: " + firstblock + "  " + secondblock);
 
-			ParkingProblem ParkingProblem = new ParkingProblem(firstblock, secondblock, blockdata, 500, yard, eventList);
-			outputParking = ParkingProblem.returnOutput();
-			zero = ParkingProblem.getObjective();
+//			ParkingProblem ParkingProblem = new ParkingProblem(firstblock, secondblock, blockdata, 500, yard, eventList);
+//			outputParking = ParkingProblem.returnOutput();
+//			zero = ParkingProblem.getObjective();
 
 			long timeParkingEnd  = System.currentTimeMillis();
 			System.out.println("Parking Executed in " + (timeParkingEnd-timeParkingStart));
@@ -180,26 +183,30 @@ public class TotalMain {
 			HeuristicWithJobShop model = new HeuristicWithJobShop(nrTrains, blockdata, data, yard, eventList, priorityArrivaltrack,  priorityArrival, priorityType1, priorityType2, priorityType3, priorityType4, priorityType4extra, priorityPlatform1, priorityPlatform2); //create the model
 
 			
-			
-			results = model.optimization(test); //run the model and obtain output
 			int run = i+1;
+			results = model.optimization(nrTrains, test, run); //run the model and obtain output
+
 			long timeHeurEnd = System.currentTimeMillis();
 			System.out.println("Heuristic Executed in " + (timeHeurEnd-timeHeurStart));
-			
 			
 			System.out.println("Run " + run);
 			System.out.println("Right track departures:  " + results[1]);
 			System.out.println("Completed activities:  " + results[0]);
 			System.out.println();
 			
-			if(results[1] > 22.5 && results[1] < 23.5)
+//			if(results[1] > 22.5 && results[1] < 23.5)
+//			{counterdeparture = counterdeparture +1;}
+			if(results[1] > nrTrains-0.5 && results[1] < nrTrains+0.5)
 			{counterdeparture = counterdeparture +1;}
 			if(results[0] > 0.999)
 			{countervolledigfeasible = countervolledigfeasible +1;}
 			
 			avgactivity = avgactivity + results[0];
-			if(results[0] > 0.999 && results[1] > 22.5){
-				countervolledigfeasiblehelemaal = countervolledigfeasiblehelemaal +1;
+//			if(results[0] > 0.999 && results[1] > 22.5){
+//				countervolledigfeasiblehelemaal = countervolledigfeasiblehelemaal +1;
+//			}
+			if(results[0] > 0.999 && results[1] > nrTrains-0.5){
+			countervolledigfeasiblehelemaal = countervolledigfeasiblehelemaal +1;
 			}
 			
 			long timeItEnd = System.currentTimeMillis();
@@ -211,7 +218,7 @@ public class TotalMain {
 			
 //			matching is emptied in the try
 			jobshop = null;
-			ParkingProblem = null;
+//			ParkingProblem = null;
 			model = null;
 			
 			System.gc();
@@ -310,6 +317,39 @@ public class TotalMain {
 			}
 		}
 		return length;
+	}
+	
+	public static void writeExcel(int[][] matrix, String filename){
+
+		FileWriter fileWriter = null;
+		String FILE_HEADER = filename;
+		String COMMA_DELIMITER = ";"; //maybe this must be comma
+		String NEW_LINE_SEPARATOR = "\r\n";
+
+
+		try{
+//			String name = "CompositionTimesMatching.csv";
+			String name = filename;
+			fileWriter = new FileWriter(name);
+			fileWriter.append(FILE_HEADER.toString());
+			fileWriter.append(NEW_LINE_SEPARATOR);
+			for(int i=0;i<matrix.length;i++){ //each line
+
+				for(int j=0;j<matrix[0].length;j++){ //each cel
+					fileWriter.append(Integer.toString(matrix[i][j]));
+					fileWriter.append(COMMA_DELIMITER);
+				}
+				fileWriter.append(NEW_LINE_SEPARATOR);
+			}
+		} catch (Exception e) {
+		} finally {
+			try {
+				fileWriter.flush();
+				fileWriter.close();
+			} catch (IOException e) {
+
+			}
+		}
 	}
 }
 

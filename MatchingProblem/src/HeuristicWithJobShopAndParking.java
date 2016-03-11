@@ -2,7 +2,8 @@
 
 	
 	import java.io.FileNotFoundException;
-	import java.io.IOException;
+import java.io.FileWriter;
+import java.io.IOException;
 	import java.util.ArrayList;
 	import java.util.Arrays;
 	import java.util.Collections;
@@ -56,7 +57,7 @@
 			this.departureReserve = departureReserve;
 		}
 
-		public double[]  optimization(int[][] tpm) throws FileNotFoundException, IOException{
+		public double[]  optimization(int nrTrains, int[][] tpm, int iteration) throws FileNotFoundException, IOException{
 			//This should all be implemented in the data set, and the shunting yard
 			ArrayList<Integer> positions = new ArrayList<Integer>(); // Alle posities leeg
 			dijkstraMovement move = new dijkstraMovement();
@@ -342,7 +343,7 @@
 					if (positiearrival != -1){
 						int endPosition = -1;	
 						for (int i=0;i<priorityArrivalarea.length;i++){
-							movementTime = move.possibleMovement(blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
+							movementTime = move.possibleMovement(nrTrains, blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
 							if(movementTime!=0 && movementTime<100){							
 								endPosition = priorityArrivalarea[i];
 								int id = positions.get(positiearrival);
@@ -389,7 +390,7 @@
 					if (positiearrival != -1){
 						int endPosition = -1;	
 						for (int i=0;i<priorityArrivalarea.length;i++){
-							movementTime = move.possibleMovement(blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
+							movementTime = move.possibleMovement(nrTrains, blockdata, positiearrival+1, priorityArrivalarea[i], positions, Data, Yard);
 							if(movementTime!=0 && movementTime<100){
 								endPosition = priorityArrivalarea[i];
 								int id;
@@ -414,7 +415,7 @@
 									}
 								}
 								if(!known){
-									System.out.println("hoi  " + id);
+//									System.out.println("hoi  " + id);
 								setMovementList(id, blockdata, numberTrains);
 								}
 								for (int n = 0; n<50; n++){
@@ -498,7 +499,7 @@
 								
 								counterindex = 0;
 								if (depArea54.contains(positions.get(intWashposition-1))){
-									System.out.println(positions.get(intWashposition-1));
+//									System.out.println(positions.get(intWashposition-1));
 									for (int p = 24; p > 19; p--){
 										checkParking = true; 
 										departureArea.add(counterindex, p);
@@ -560,7 +561,7 @@
 								checkParking = false; 
 								
 								for (int q=0;q<departureArea.size();q++){
-									movementTime = move.possibleMovement(blockdata, intWashposition, departureArea.get(q), positions, Data, Yard);
+									movementTime = move.possibleMovement(nrTrains, blockdata, intWashposition, departureArea.get(q), positions, Data, Yard);
 									if(movementTime!=0 && movementTime <100){
 										endPosition = departureArea.get(q);
 										int id = positions.get(intWashposition-1);
@@ -588,7 +589,7 @@
 							else if (List.getActivitylist()[location][3] != 0){
 								int endPosition = -1;
 								for (int q=0;q<priorityType2.length;q++){
-									movementTime = move.possibleMovement(blockdata, intWashposition, priorityType2[q], positions, Data, Yard);
+									movementTime = move.possibleMovement(nrTrains, blockdata, intWashposition, priorityType2[q], positions, Data, Yard);
 									if(movementTime!=0 && movementTime <100){
 										endPosition = priorityType2[q];
 										int id = positions.get(intWashposition-1);
@@ -624,7 +625,7 @@
 								// Als hij nog iets anders moet doen (kan eigenlijk niet, maar to be sure), gaat hij terug naar de arrival area
 								int endPosition = -1;
 								for (int q=0;q<priorityArrivalarea.length;q++){
-									movementTime = move.possibleMovement(blockdata, intWashposition, priorityArrivalarea[q], positions, Data, Yard);
+									movementTime = move.possibleMovement(nrTrains, blockdata, intWashposition, priorityArrivalarea[q], positions, Data, Yard);
 									if(movementTime!=0 && movementTime <100){
 										endPosition = priorityArrivalarea[q];
 										int id = positions.get(intWashposition-1);
@@ -766,7 +767,7 @@
 								
 								counterindex = 0;
 								for (int q=0;q<departureArea.size();q++){
-									movementTime = move.possibleMovement(blockdata, extWashposition, departureArea.get(q), positions, Data, Yard);
+									movementTime = move.possibleMovement(nrTrains, blockdata, extWashposition, departureArea.get(q), positions, Data, Yard);
 									if(movementTime!=0 && movementTime <100){
 										endPosition = departureArea.get(q);
 										int id = positions.get(extWashposition-1);
@@ -792,7 +793,7 @@
 								//Zoniet dan gaat hij naar de arrival area (niet terug naar internal cleaning omdat die te druk bezet is). 
 								int endPosition = -1;
 								for (int q=0;q<priorityArrivalarea.length;q++){
-									movementTime = move.possibleMovement(blockdata, extWashposition, priorityArrivalarea[q], positions, Data, Yard);						
+									movementTime = move.possibleMovement(nrTrains, blockdata, extWashposition, priorityArrivalarea[q], positions, Data, Yard);						
 									if(movementTime!=0 && movementTime <100){
 										endPosition = priorityArrivalarea[q];
 										int id = positions.get(extWashposition-1);
@@ -833,7 +834,7 @@
 							if(plat1fill==false){
 								int currentPosition = getIndex(positions, priorityPlatform1.get(j));
 								if (currentPosition != -1){ // als hij nog niet in het model is
-								movementTime = move.possibleMovement(blockdata, currentPosition+1, platform1[p], positions, Data, Yard);
+								movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, platform1[p], positions, Data, Yard);
 								if(movementTime!=0 && movementTime<100){
 									plat1fill = true;
 									int endPosition = platform1[p];
@@ -895,7 +896,7 @@
 							if(plat2fill==false){
 								int currentPosition = getIndex(positions, priorityPlatform2.get(j));
 								if (currentPosition != -1){
-								movementTime = move.possibleMovement(blockdata, currentPosition+1, platform2[p], positions, Data, Yard);
+								movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, platform2[p], positions, Data, Yard);
 								if(movementTime!=0 && movementTime<100){
 									plat2fill = true;			
 									int endPosition = platform2[p];
@@ -1005,7 +1006,7 @@
 							else if(movementType ==2){ // external cleaning
 							
 								for (int i=0;i<priorityType2.length;i++){
-									movementTime = move.possibleMovement(blockdata, currentPosition+1, priorityType2[i], positions, Data, Yard);
+									movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, priorityType2[i], positions, Data, Yard);
 									if(movementTime!=0 && movementTime<100){
 										moveexecuted = true;
 										endPosition = priorityType2[i];
@@ -1131,7 +1132,7 @@
 										List.setMovementlist(Integer.MAX_VALUE, movementTrainID, movementType , movementMin[0]);
 									}
 									if (alreadyDeparture = false){
-										movementTime = move.possibleMovement(blockdata, currentPosition+1, departureArea.get(q), positions, Data, Yard);
+										movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, departureArea.get(q), positions, Data, Yard);
 										if(movementTime!=0 && movementTime<100){
 											moveexecuted = true;
 											endPosition = departureArea.get(q);
@@ -1164,7 +1165,7 @@
 //									if (movementTrainID == 80428 || movementTrainID == 80206 || movementTrainID == 83071){
 										for (int i=0;i<priorityType4extra.length;i++){
 											if (priorityType4[i] != 1 && priorityType4[i] != 2){
-											movementTime = move.possibleMovement(blockdata, currentPosition+1, priorityType4extra[i], positions, Data, Yard);
+											movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, priorityType4extra[i], positions, Data, Yard);
 											if(movementTime!=0 && movementTime<100){
 												moveexecuted = true;
 												endPosition = priorityType4extra[i];
@@ -1200,7 +1201,7 @@
 									else {
 										for (int i=0;i<priorityType4.length;i++){
 											if (priorityType4[i] != 1 && priorityType4[i] != 2){
-											movementTime = move.possibleMovement(blockdata, currentPosition+1, priorityType4[i], positions, Data, Yard);
+											movementTime = move.possibleMovement(nrTrains, blockdata, currentPosition+1, priorityType4[i], positions, Data, Yard);
 											if(movementTime!=0 && movementTime<100){
 												moveexecuted = true; 
 												endPosition = priorityType4[i];
@@ -1255,11 +1256,15 @@
 //				}
 			
 			// print end position matrix
-			System.out.println();
-			printpositionTrainMatrix(matrix, numberTrains);
-			System.out.println();
-			printtijdTrainMatrix(movementtijdmatrix, numberTrains);
-			printDoubleArray(results);
+//			System.out.println();
+//			printpositionTrainMatrix(matrix, numberTrains);
+//			System.out.println();
+//			printtijdTrainMatrix(movementtijdmatrix, numberTrains);
+//			printDoubleArray(results);
+			writeExcel(results, "Results.csv");
+			writeExcel(matrix, "PositionTrainMatrix.csv");
+			writeExcel(movementtijdmatrix, "MovementTrainMatrix.csv");
+
 			
 			// print performance
 			double result1 = printPerformance(List.activitylist);
@@ -1815,6 +1820,39 @@
 					System.out.print(printer[i][j] + "  " );
 				}
 				System.out.println();
+			}
+		}
+		
+		public void writeExcel(int[][] matrix, String filename){
+
+			FileWriter fileWriter = null;
+			String FILE_HEADER = filename;
+			String COMMA_DELIMITER = ";"; //maybe this must be comma
+			String NEW_LINE_SEPARATOR = "\r\n";
+
+
+			try{
+//				String name = "CompositionTimesMatching.csv";
+				String name = filename;
+				fileWriter = new FileWriter(name);
+				fileWriter.append(FILE_HEADER.toString());
+				fileWriter.append(NEW_LINE_SEPARATOR);
+				for(int i=0;i<matrix.length;i++){ //each line
+
+					for(int j=0;j<matrix[0].length;j++){ //each cel
+						fileWriter.append(Integer.toString(matrix[i][j]));
+						fileWriter.append(COMMA_DELIMITER);
+					}
+					fileWriter.append(NEW_LINE_SEPARATOR);
+				}
+			} catch (Exception e) {
+			} finally {
+				try {
+					fileWriter.flush();
+					fileWriter.close();
+				} catch (IOException e) {
+
+				}
 			}
 		}
 	}
